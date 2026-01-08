@@ -21,7 +21,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Meta Information Card -->
         <div class="lg:col-span-1 space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6">İşlem Bilgileri</h3>
                 
                 <div class="space-y-6">
@@ -114,9 +114,9 @@
                         <table class="w-full text-left">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100">
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/4">Alan Adı</th>
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Eski Değer</th>
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Yeni Değer</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/4">Alan Adı</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Eski Değer</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Yeni Değer</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-50">
@@ -126,13 +126,13 @@
                                     @endphp
                                     @if($oldValue != $newValue)
                                         <tr class="hover:bg-slate-50/30">
-                                            <td class="px-6 py-4 text-sm font-bold text-slate-700 font-mono">{{ $key }}</td>
-                                            <td class="px-6 py-4">
+                                            <td class="px-4 md:px-6 py-4 text-sm font-bold text-slate-700 font-mono">{{ $key }}</td>
+                                            <td class="px-4 md:px-6 py-4">
                                                 <div class="text-xs text-rose-700 bg-rose-50 border border-rose-100 rounded-lg p-2 font-mono break-all inline-block min-w-full">
                                                     {{ is_array($oldValue) ? json_encode($oldValue) : ($oldValue ?? 'null') }}
                                                 </div>
                                             </td>
-                                            <td class="px-6 py-4">
+                                            <td class="px-4 md:px-6 py-4">
                                                 <div class="text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg p-2 font-mono break-all inline-block min-w-full">
                                                     {{ is_array($newValue) ? json_encode($newValue) : ($newValue ?? 'null') }}
                                                 </div>
@@ -148,15 +148,15 @@
                         <table class="w-full text-left">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100">
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Alan Adı</th>
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-2/3">Değer</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Alan Adı</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-2/3">Değer</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-50">
                                 @foreach($activityLog->properties['attributes'] as $key => $value)
                                      <tr class="hover:bg-slate-50/30">
-                                        <td class="px-6 py-4 text-sm font-bold text-slate-700 font-mono">{{ $key }}</td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-4 md:px-6 py-4 text-sm font-bold text-slate-700 font-mono">{{ $key }}</td>
+                                        <td class="px-4 md:px-6 py-4">
                                             <div class="text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-lg p-2 font-mono break-all inline-block min-w-full">
                                                 {{ is_array($value) ? json_encode($value) : ($value ?? 'null') }}
                                             </div>
@@ -171,15 +171,15 @@
                         <table class="w-full text-left">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100">
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Alan Adı</th>
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-2/3">Değer</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Alan Adı</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-2/3">Değer</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-50">
                                 @foreach($activityLog->properties['new'] as $key => $value)
                                      <tr class="hover:bg-slate-50/30">
-                                        <td class="px-6 py-4 text-sm font-bold text-slate-700 font-mono">{{ $key }}</td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-4 md:px-6 py-4 text-sm font-bold text-slate-700 font-mono">{{ $key }}</td>
+                                        <td class="px-4 md:px-6 py-4">
                                             <div class="text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-lg p-2 font-mono break-all inline-block min-w-full">
                                                 {{ is_array($value) ? json_encode($value) : ($value ?? 'null') }}
                                             </div>
@@ -194,15 +194,15 @@
                         <table class="w-full text-left">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100">
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Alan Adı</th>
-                                    <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-2/3">Silinen Değer</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-1/3">Alan Adı</th>
+                                    <th class="px-4 md:px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider w-2/3">Silinen Değer</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-50">
                                 @foreach($activityLog->properties['old'] ?? $activityLog->properties['attributes'] as $key => $value)
                                      <tr class="hover:bg-slate-50/30">
-                                        <td class="px-6 py-4 text-sm font-bold text-slate-700 font-mono">{{ $key }}</td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-4 md:px-6 py-4 text-sm font-bold text-slate-700 font-mono">{{ $key }}</td>
+                                        <td class="px-4 md:px-6 py-4">
                                             <div class="text-xs text-rose-700 bg-rose-50 border border-rose-100 rounded-lg p-2 font-mono break-all inline-block min-w-full">
                                                 {{ is_array($value) ? json_encode($value) : ($value ?? 'null') }}
                                             </div>

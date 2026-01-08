@@ -74,7 +74,7 @@
             <!-- Left Column: Main Info -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Temel Bilgiler Section -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-8 border-b border-slate-50 pb-4">Temel Bilgiler</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -160,7 +160,7 @@
                 </div>
 
                 <!-- Fiyatlandırma Section -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-8 border-b border-slate-50 pb-4">Fiyatlandırma</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
@@ -238,7 +238,7 @@
                 </div>
 
                 <!-- Stok Yönetimi Section -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm">
                     <div class="flex items-center justify-between mb-8 border-b border-slate-50 pb-4">
                         <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Stok Yönetimi</h3>
                         <div class="flex items-center gap-3">
@@ -275,7 +275,7 @@
             <!-- Right Column: Image & Status -->
             <div class="space-y-6">
                  <!-- Image Upload -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Ürün Görseli</h3>
                     <div class="flex flex-col items-center justify-center w-full" x-data="{ 
                         imagePreview: '{{ $product->image_path ? Storage::disk('uploads')->url($product->image_path) : null }}',
@@ -300,7 +300,7 @@
                 </div>
 
                 <!-- Status -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Yayın Durumu</h3>
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Durum</label>
                     <select name="status" class="w-full h-12 px-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all appearance-none cursor-pointer">

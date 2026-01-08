@@ -6,9 +6,9 @@
 <div class="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500" x-data="{ activeTab: 'general', deleteModalOpen: false }">
     
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div class="flex items-center gap-4">
-            <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-100 text-indigo-600 shadow-sm">
+            <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-100 text-indigo-600 shadow-sm flex-shrink-0">
                 <i class='bx bx-cog text-2xl'></i>
             </div>
             <div>
@@ -16,7 +16,7 @@
                 <p class="text-slate-500 text-sm mt-1">Firmanızın genel yapılandırma ayarlarını buradan yönetebilirsiniz.</p>
             </div>
         </div>
-        <button type="submit" form="settings-form" class="h-10 px-6 flex items-center justify-center rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+        <button type="submit" form="settings-form" class="w-full md:w-auto h-12 md:h-10 px-6 flex items-center justify-center rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
             <i class='bx bx-save text-xl mr-2'></i>
             DEĞİŞİKLİKLERİ KAYDET
         </button>
@@ -26,6 +26,32 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- Sidebar Navigation -->
         <div class="lg:col-span-1 space-y-2">
+            <!-- Mobile Dropdown -->
+            <div class="lg:hidden relative mb-4">
+                <select x-model="activeTab" class="w-full h-14 pl-5 pr-10 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-600/20 shadow-sm transition-all">
+                    @foreach(['general', 'logo', 'proposal', 'proposal_design', 'email', 'sms', 'danger'] as $group)
+                        @php
+                            if($group !== 'danger' && !$groupedSettings->has($group)) continue; 
+                            $groupLabels = [
+                                'general' => 'Genel Ayarlar',
+                                'logo' => 'Logo Ayarları',
+                                'proposal' => 'Teklif Ayarları',
+                                'proposal_design' => 'Teklif Tasarımı',
+                                'email' => 'E-posta Ayarları',
+                                'sms' => 'SMS Ayarları',
+                                'danger' => 'Verilerimi ve Hesabımı Sil',
+                            ];
+                        @endphp
+                        <option value="{{ $group }}">{{ $groupLabels[$group] ?? ucfirst($group) }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 bg-white p-1">
+                    <i class='bx bx-chevron-down text-xl'></i>
+                </div>
+            </div>
+
+            <!-- Desktop Sidebar -->
+            <div class="hidden lg:block space-y-2">
             @foreach(['general', 'logo', 'proposal', 'proposal_design', 'email', 'sms', 'danger'] as $group)
                 @php
                     if($group !== 'danger' && !$groupedSettings->has($group)) continue; 
@@ -64,6 +90,7 @@
                     <i class='bx bx-chevron-right ml-auto text-xl opacity-0 transition-opacity' :class="activeTab === '{{ $group }}' ? 'opacity-100' : ''"></i>
                 </button>
             @endforeach
+            </div>
         </div>
 
         <!-- Form Area -->
@@ -80,7 +107,7 @@
                          @if($group === 'email') x-data="{ provider: '{{ $settings->where('key', 'mail_provider')->first()->value ?? 'smtp' }}' }" @endif
                     >
                         
-                        <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm space-y-8">
+                        <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm space-y-8">
                             <div class="border-b border-slate-50 pb-6 mb-6">
                                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">{{ $groupLabels[$group] ?? ucfirst($group) }}</h3>
                                 <p class="text-xs text-slate-400 font-bold mt-1">Bu bölümdeki ayarlar {{ strtolower($groupLabels[$group] ?? $group) }} süreçlerini etkiler.</p>
@@ -479,7 +506,7 @@
                      x-transition:enter-end="opacity-100 translate-y-0"
                      style="display: none;">
                     
-                    <div class="bg-white rounded-md p-8 border border-red-100 shadow-sm space-y-8 relative overflow-hidden">
+                    <div class="bg-white rounded-md p-4 md:p-8 border border-red-100 shadow-sm space-y-8 relative overflow-hidden">
                         <!-- Striped Background -->
                         <div class="absolute top-0 left-0 w-full h-1 bg-[repeating-linear-gradient(45deg,#fee2e2,#fee2e2_10px,#fff_10px,#fff_20px)]"></div>
 

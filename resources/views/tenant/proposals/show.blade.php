@@ -3,17 +3,17 @@
 @section('content')
 <div class="max-w-8xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     <!-- Header -->
-    <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4">
-            <a href="{{ route('proposals.index') }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all shadow-sm">
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-6 mb-8">
+        <div class="flex items-center gap-4 w-full lg:w-auto">
+            <a href="{{ route('proposals.index') }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all shadow-sm shrink-0">
                 <i class='bx bx-chevron-left text-2xl'></i>
             </a>
             <div>
-                <h1 class="text-xl font-extrabold text-slate-950 tracking-tight">{{ $proposal->title }} </h1>
-                <div class="flex items-center gap-3 mt-1">
-                    <p class="text-slate-500 text-sm font-medium">{{ $proposal->proposal_number }} - Teklif Detayı</p>
-                    <div class="h-1 w-1 rounded-full bg-slate-300"></div>
-                    <p class="text-[10px] text-slate-400 flex items-center gap-1.5 font-medium">
+                <h1 class="text-xl font-extrabold text-slate-950 tracking-tight line-clamp-1">{{ $proposal->title }} </h1>
+                <div class="flex flex-wrap items-center gap-3 mt-1">
+                    <p class="text-slate-500 text-sm font-medium whitespace-nowrap">{{ $proposal->proposal_number }} - Teklif Detayı</p>
+                    <div class="hidden sm:block h-1 w-1 rounded-full bg-slate-300"></div>
+                    <p class="text-[10px] text-slate-400 items-center gap-1.5 font-medium hidden sm:flex">
                         <i class='bx bx-pencil text-[11px] text-indigo-400'></i>
                         <span class="opacity-70 text-[9px] uppercase tracking-tighter">HAZIRLAYAN:</span>
                         <span class="text-slate-700 font-black uppercase tracking-tight">
@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2" x-data="{ 
+        <div class="w-full lg:w-auto" x-data="{ 
             confirmModal: false, 
             actionTitle: '', 
             actionDescription: '', 
@@ -40,56 +40,69 @@
                 this.confirmModal = true;
             }
         }">
-            <!-- Quick Actions in Header -->
-            <a href="{{ route('proposals.edit', $proposal) }}" class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all shadow-sm" data-tooltip="Düzenle">
-                <i class='bx bx-edit-alt text-xl'></i>
-            </a>
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+                
+                <!-- Quick Actions (Scrollable on mobile) -->
+                <div class="overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 lg:pb-0">
+                    <div class="flex items-center gap-2 min-w-max">
+                        <a href="{{ route('proposals.edit', $proposal) }}" class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all shadow-sm" data-tooltip="Düzenle">
+                            <i class='bx bx-edit-alt text-xl'></i>
+                        </a>
 
-            <button type="button" 
-                    @click="openModal('WhatsApp ile Paylaş', '{{ $proposal->customer->mobile_phone }} numaralı telefona WhatsApp üzerinden mesaj gönderilecektir.', 'whatsapp-form', 'WhatsApp\'ı Aç', 'bg-emerald-600')"
-                    class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all shadow-sm" data-tooltip="WhatsApp ile Gönder">
-                <i class='bx bxl-whatsapp text-xl'></i>
-            </button>
+                        <button type="button" 
+                                @click="openModal('WhatsApp ile Paylaş', '{{ $proposal->customer->mobile_phone }} numaralı telefona WhatsApp üzerinden mesaj gönderilecektir.', 'whatsapp-form', 'WhatsApp\'ı Aç', 'bg-emerald-600')"
+                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all shadow-sm" data-tooltip="WhatsApp ile Gönder">
+                            <i class='bx bxl-whatsapp text-xl'></i>
+                        </button>
 
-            <button type="button" 
-                    @click="openModal('SMS Gönder', '{{ $proposal->customer->mobile_phone }} numaralı telefona teklif özeti SMS olarak gönderilecektir.', 'sms-form', 'SMS Gönder', 'bg-blue-600')"
-                    class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm" data-tooltip="SMS Gönder">
-                <i class='bx bx-message-square-dots text-xl'></i>
-            </button>
+                        <button type="button" 
+                                @click="openModal('SMS Gönder', '{{ $proposal->customer->mobile_phone }} numaralı telefona teklif özeti SMS olarak gönderilecektir.', 'sms-form', 'SMS Gönder', 'bg-blue-600')"
+                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm" data-tooltip="SMS Gönder">
+                            <i class='bx bx-message-square-dots text-xl'></i>
+                        </button>
 
-            <button type="button" 
-                    @click="openModal('E-Posta Gönder', '{{ $proposal->customer->company_email }} adresine teklif PDF dosyası e-posta olarak gönderilecektir.', 'email-form', 'E-Posta Gönder', 'bg-rose-600')"
-                    class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all shadow-sm" data-tooltip="E-Posta Gönder">
-                <i class='bx bx-envelope text-xl'></i>
-            </button>
+                        <button type="button" 
+                                @click="openModal('E-Posta Gönder', '{{ $proposal->customer->company_email }} adresine teklif PDF dosyası e-posta olarak gönderilecektir.', 'email-form', 'E-Posta Gönder', 'bg-rose-600')"
+                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all shadow-sm" data-tooltip="E-Posta Gönder">
+                            <i class='bx bx-envelope text-xl'></i>
+                        </button>
 
-            <button type="button" 
-                    @click="openModal('Teklifi Sil', 'Bu teklifi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.', 'delete-form', 'Teklifi Sil', 'bg-red-600')"
-                    class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all shadow-sm" data-tooltip="Teklifi Sil">
-                <i class='bx bx-trash text-xl'></i>
-            </button>
+                        <button type="button" 
+                                @click="openModal('Teklifi Sil', 'Bu teklifi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.', 'delete-form', 'Teklifi Sil', 'bg-red-600')"
+                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all shadow-sm" data-tooltip="Teklifi Sil">
+                            <i class='bx bx-trash text-xl'></i>
+                        </button>
+                    </div>
+                </div>
 
-            <div class="h-8 w-px bg-slate-200 mx-1"></div>
+                <!-- Separator -->
+                <div class="hidden lg:block h-8 w-px bg-slate-200 mx-1"></div>
 
-             <div class="dropdown relative" x-data="{ open: false }">
-                <button @click="open = !open" class="h-11 px-6 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">
-                    Durum: {{ $proposal->status }} <i class='bx bx-chevron-down'></i>
-                </button>
-                <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50" x-cloak x-transition>
-                    <form action="{{ route('proposals.update-status', $proposal) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        @foreach(['draft' => 'Taslak', 'pending' => 'Onay Bekliyor', 'approved' => 'Onaylandı', 'rejected' => 'Reddedildi'] as $key => $label)
-                            <button type="submit" name="status" value="{{ $key }}" class="w-full text-left px-4 py-2 text-sm font-bold rounded-xl {{ $proposal->status === $key ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' }}">
-                                {{ $label }}
-                            </button>
-                        @endforeach
-                    </form>
+                <!-- Status & Print (Stacked on mobile) -->
+                <div class="flex items-center gap-2 justify-end w-full lg:w-auto">
+                    <div class="dropdown relative w-full lg:w-auto" x-data="{ open: false }">
+                        <button @click="open = !open" class="h-11 px-6 w-full lg:w-auto rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-bold hover:bg-slate-50 transition-all flex items-center justify-between lg:justify-start gap-2 shadow-sm">
+                            <span>Durum: {{ $proposal->status }}</span>
+                            <i class='bx bx-chevron-down'></i>
+                        </button>
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-full lg:w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50" x-cloak x-transition>
+                            <form action="{{ route('proposals.update-status', $proposal) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                @foreach(['draft' => 'Taslak', 'pending' => 'Onay Bekliyor', 'approved' => 'Onaylandı', 'rejected' => 'Reddedildi'] as $key => $label)
+                                    <button type="submit" name="status" value="{{ $key }}" class="w-full text-left px-4 py-2 text-sm font-bold rounded-xl {{ $proposal->status === $key ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                                        {{ $label }}
+                                    </button>
+                                @endforeach
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ route('proposals.print', $proposal) }}" target="_blank" class="h-11 px-6 rounded-xl bg-slate-950 text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center gap-2 whitespace-nowrap">
+                        <i class='bx bx-printer'></i> Yazdır
+                    </a>
                 </div>
             </div>
-            <a href="{{ route('proposals.print', $proposal) }}" target="_blank" class="h-11 px-6 rounded-xl bg-slate-950 text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center gap-2">
-                <i class='bx bx-printer'></i> Yazdır
-            </a>
 
             <!-- Hidden Forms -->
             <form id="whatsapp-form" action="{{ route('proposals.send-whatsapp', $proposal) }}" method="POST" target="_blank" class="hidden">@csrf</form>
@@ -138,7 +151,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Detay Bilgileri -->
         <div class="md:col-span-2 space-y-8">
-            <div class="bg-white rounded-3xl p-20 border border-slate-100 shadow-sm">
+            <div class="bg-white rounded-3xl p-10 md:p-20 border border-slate-100 shadow-sm">
                 <div class="flex justify-between items-start mb-12">
                     <div>
                         <h2 class="text-3xl font-black text-slate-950 mb-2">TEKLİF</h2>
@@ -163,7 +176,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-12 mb-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-12">
                     <div>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Kimden (Hazırlayan)</p>
                         <h3 class="font-extrabold text-slate-900 text-lg mb-1">{{ $proposal->user?->tenant?->name ?? (auth()->user()?->tenant?->name ?? config('app.name')) }}</h3>
@@ -180,33 +193,35 @@
                 </div>
 
                 <div class="overflow-hidden rounded-2xl border border-slate-50 mb-12">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="bg-slate-50/50 border-b border-slate-100">
-                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Açıklama</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Adet</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Birim Fiyat</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">KDV</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Toplam</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50">
-                            @foreach($proposal->items as $item)
-                            <tr>
-                                <td class="px-6 py-4 font-bold text-slate-800 text-sm">{{ $item->description }}</td>
-                                <td class="px-6 py-4 text-center text-slate-600 text-sm font-bold">{{ number_format($item->quantity, 0) }} {{ $item->unit }}</td>
-                                <td class="px-6 py-4 text-right">
-                                    <p class="text-slate-600 text-sm font-bold">{{ number_format($item->unit_price, 2) }} {{ $proposal->currency }}</p>
-                                    @if($item->discount_amount > 0)
-                                    <p class="text-[10px] text-rose-500 font-bold">-{{ number_format($item->discount_amount, 2) }} İndirim</p>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-right text-slate-400 text-xs font-bold">%{{ number_format($item->tax_rate, 0) }}</td>
-                                <td class="px-6 py-4 text-right text-slate-950 text-sm font-black">{{ number_format($item->total_price, 2) }} {{ $proposal->currency }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-slate-50/50 border-b border-slate-100">
+                                    <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Açıklama</th>
+                                    <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Adet</th>
+                                    <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Birim Fiyat</th>
+                                    <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">KDV</th>
+                                    <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Toplam</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                @foreach($proposal->items as $item)
+                                <tr>
+                                    <td class="px-4 md:px-6 py-4 font-bold text-slate-800 text-sm">{{ $item->description }}</td>
+                                    <td class="px-4 md:px-6 py-4 text-center text-slate-600 text-sm font-bold">{{ number_format($item->quantity, 0) }} {{ $item->unit }}</td>
+                                    <td class="px-4 md:px-6 py-4 text-right">
+                                        <p class="text-slate-600 text-sm font-bold">{{ number_format($item->unit_price, 2) }} {{ $proposal->currency }}</p>
+                                        @if($item->discount_amount > 0)
+                                        <p class="text-[10px] text-rose-500 font-bold">-{{ number_format($item->discount_amount, 2) }} İndirim</p>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 md:px-6 py-4 text-right text-slate-400 text-xs font-bold">%{{ number_format($item->tax_rate, 0) }}</td>
+                                    <td class="px-4 md:px-6 py-4 text-right text-slate-950 text-sm font-black">{{ number_format($item->total_price, 2) }} {{ $proposal->currency }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Redesigned Payment Summary (Under items) -->

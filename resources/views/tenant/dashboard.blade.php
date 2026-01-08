@@ -32,11 +32,10 @@
         </div>
         @endif
 
-        <div class="flex items-center gap-3">
-            <button class="h-12 px-6 rounded-2xl bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm hover:shadow-md flex items-center gap-2 group">
+        <div class="flex items-center gap-3 w-full md:w-auto">
+            <button class="h-12 px-6 rounded-2xl bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 group w-full md:w-auto">
                 <i class='bx bx-export text-xl group-hover:scale-110 transition-transform'></i> {{ __('Dışa Aktar') }}
             </button>
-            
         </div>
     </div>
     
@@ -228,7 +227,7 @@
     @endpush
 
     <!-- Business Overview Grid -->
-    <div id="stats-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+    <div id="stats-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <!-- Total Customers -->
         <div class="bg-white p-6 rounded-md border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all group cursor-default relative overflow-hidden">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full group-hover:bg-emerald-100/50 transition-colors"></div>
@@ -334,7 +333,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <!-- Recent Proposals Table -->
         <div class="lg:col-span-8 bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-            <div class="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+            <div class="px-4 md:px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
                 <div>
                     <h2 class="text-base font-black text-slate-900">{{ __('Güncel Teklifler') }}</h2>
                     <p class="text-[11px] text-slate-500 font-medium">{{ __('Son 30 gün içerisindeki tüm hareketlilik') }}</p>
@@ -368,17 +367,17 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50/50">
-                                <th class="px-8 py-5">{{ __('Ref / Müşteri') }}</th>
+                                <th class="px-4 md:px-8 py-5">{{ __('Ref / Müşteri') }}</th>
                                 <th class="px-4 py-5">{{ __('Teklif') }}</th>
                                 <th class="px-4 py-5">{{ __('Tutar') }}</th>
                                 <th class="px-4 py-5">{{ __('Durum') }}</th>
-                                <th class="px-8 py-5 text-right"></th>
+                                <th class="px-4 md:px-8 py-5 text-right"></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-50/50">
                             @foreach($recentProposals as $proposal)
                             <tr class="hover:bg-slate-50/50 transition-all group cursor-pointer" onclick="window.location='{{ route('proposals.show', $proposal) }}'">
-                                <td class="px-8 py-5">
+                                <td class="px-4 md:px-8 py-5">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
                                             <i class='bx bx-file text-xl text-slate-400 group-hover:text-indigo-600'></i>
@@ -425,7 +424,7 @@
                                         {{ $label }}
                                     </span>
                                 </td>
-                                <td class="px-8 py-5 text-right">
+                                <td class="px-4 md:px-8 py-5 text-right">
                                     <button class="w-8 h-8 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-100 transition-all text-slate-400">
                                         <i class='bx bx-right-arrow-alt text-xl'></i>
                                     </button>
@@ -444,7 +443,7 @@
         <!-- Right Side: Pipeline & Activities -->
         <div class="lg:col-span-4 space-y-8">
             <!-- Pipeline Card -->
-            <div class="bg-white p-8 rounded-md border border-slate-100 shadow-sm relative overflow-hidden">
+            <div class="bg-white p-4 md:p-8 rounded-md border border-slate-100 shadow-sm relative overflow-hidden">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">{{ __('Huni Analizi') }}</h3>
                     <i class='bx bx-info-circle text-slate-300 hover:text-slate-600 cursor-help transition-colors'></i>
@@ -502,7 +501,7 @@
             </div>
 
             <!-- Elegant Timeline -->
-            <div class="bg-white p-8 rounded-md border border-slate-100 shadow-sm">
+            <div class="bg-white p-4 md:p-8 rounded-md border border-slate-100 shadow-sm">
                 <h3 class="text-sm font-black text-slate-900 mb-6 uppercase tracking-wider">{{ __('Son Etkileşimler') }}</h3>
                 
                 @if($recentActivities->isEmpty())

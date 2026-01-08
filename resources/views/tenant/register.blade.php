@@ -126,8 +126,7 @@
                 </div>
             </div>
         </div>
-        
-        <div class="fixed bottom-0 left-0 w-full py-6 flex flex-col items-center gap-4 z-50 bg-[#fafafa]">
+         <div class="w-full py-6 flex flex-col items-center gap-4 z-50 bg-[#fafafa] md:fixed md:bottom-0 md:left-0">
              <!-- Language Switcher -->
              <div x-data="{ open: false }" class="relative">
                 <button @click="open = !open" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm hover:shadow text-xs font-bold text-slate-600 transition-all">

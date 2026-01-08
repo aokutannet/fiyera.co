@@ -10,9 +10,9 @@
      x-data="proposalForm()">
     
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div class="flex items-center gap-4">
-            <a href="{{ route('proposals.index') }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all shadow-sm">
+            <a href="{{ route('proposals.index') }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all shadow-sm flex-shrink-0">
                 <i class='bx bx-chevron-left text-2xl'></i>
             </a>
             <div>
@@ -45,7 +45,7 @@
             <!-- Sol Kolon: Teklif Bilgileri -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Temel Bilgiler -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm space-y-6">
+                <div class="bg-white rounded-md p-5 md:p-8 border border-slate-100 shadow-sm space-y-6">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">Teklif Başlığı & Müşteri</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -86,7 +86,7 @@
                 </div>
 
                 <!-- Teklif Kalemleri -->
-                <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-3xl p-5 md:p-8 border border-slate-100 shadow-sm">
                     <div class="flex items-center justify-between mb-8 border-b border-slate-50 pb-4">
                         <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Teklif Kalemleri</h3>
                         <button type="button" @click="addItem()" class="h-9 px-4 rounded-xl bg-indigo-50 text-indigo-600 text-xs font-bold hover:bg-indigo-100 transition-all flex items-center gap-2">
@@ -208,7 +208,7 @@
                 </div>
 
                 <!-- Notlar -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-md p-5 md:p-8 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">Teklif Notları & Şartlar</h3>
                     <textarea name="notes" rows="4" 
                         class="w-full p-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all"
@@ -219,7 +219,7 @@
             <!-- Sağ Kolon: Tarihler ve Özet -->
             <div class="space-y-8">
                 <!-- Tarih ve Ek Bilgiler -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm space-y-6">
+                <div class="bg-white rounded-md p-5 md:p-8 border border-slate-100 shadow-sm space-y-6">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">Tarih & Ödeme</h3>
                     
                     <div>
@@ -252,7 +252,7 @@
                 </div>
 
                 <!-- Özet Bilgiler -->
-                <div class="bg-slate-900 rounded-2xl p-8 shadow-2xl shadow-slate-200 relative overflow-hidden">
+                <div class="bg-slate-900 rounded-2xl p-6 md:p-8 shadow-2xl shadow-slate-200 relative overflow-hidden">
                     <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 opacity-10">
                         <i class='bx bx-receipt text-[160px] text-white rotate-12'></i>
                     </div>

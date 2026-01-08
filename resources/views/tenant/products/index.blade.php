@@ -78,9 +78,94 @@
         </div>
     </div>
 
-    <!-- Products Table -->
-    <div class="bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden mt-6">
-        <table class="w-full text-left">
+    <!-- Mobile Product Cards -->
+    <div class="grid grid-cols-1 gap-4 md:hidden mt-6">
+        @foreach($products as $product)
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm relative overflow-hidden group">
+            <div class="flex items-start gap-4">
+                <!-- Image -->
+                <a href="{{ route('products.show', $product) }}" class="w-16 h-16 rounded-xl bg-indigo-50 border border-slate-100 flex items-center justify-center text-indigo-600 overflow-hidden flex-shrink-0">
+                    @if($product->image_path)
+                        <img src="{{ Storage::disk('uploads')->url($product->image_path) }}" class="w-full h-full object-cover">
+                    @else
+                        <i class='bx bx-package text-2xl'></i>
+                    @endif
+                </a>
+                
+                <!-- Details -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start">
+                        <div>
+                             <a href="{{ route('products.show', $product) }}" class="text-sm font-bold text-slate-900 block truncate pr-6">{{ $product->name }}</a>
+                             <p class="text-xs text-slate-400 font-bold">{{ $product->code ?? 'Kod Yok' }}</p>
+                        </div>
+                    </div>
+
+                    {{-- Category --}}
+                    <div class="mt-2">
+                         <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">
+                            {{ $product->productCategory->name ?? 'Kategori Yok' }}
+                        </span>
+                    </div>
+                </div>
+                
+                 <!-- Status Badge (Absolute Top Right) -->
+                <div class="absolute top-4 right-4">
+                     @if($product->status === 'active')
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 block shadow-sm shadow-emerald-200"></span>
+                    @else
+                        <span class="w-2 h-2 rounded-full bg-slate-300 block"></span>
+                    @endif
+                </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                <div class="flex flex-col">
+                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Fiyat</span>
+                     <span class="text-sm font-black text-slate-900">{{ number_format($product->price, 2) }} {{ $product->selling_currency }}</span>
+                </div>
+                <div class="flex flex-col text-right">
+                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stok</span>
+                     @if($product->stock_tracking)
+                        <span class="text-sm font-bold {{ $product->stock <= ($product->critical_stock_quantity ?? 0) ? 'text-rose-600' : 'text-slate-700' }}">
+                            {{ $product->stock }} {{ $product->unit }}
+                        </span>
+                    @else
+                        <span class="text-xs font-bold text-slate-400">Limitsiz</span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-4 flex gap-2">
+                 <a href="{{ route('products.show', $product) }}" class="flex-1 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 text-xs font-bold hover:bg-slate-100 transition-all">
+                    Detay
+                </a>
+                @if(auth()->user()->hasPermission('products.edit'))
+                <a href="{{ route('products.edit', $product) }}" class="h-10 w-10 flex items-center justify-center rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 transition-all">
+                    <i class='bx bx-edit-alt text-lg'></i>
+                </a>
+                @endif
+                 @if(auth()->user()->hasPermission('products.delete'))
+                <button @click="confirmDelete({{ json_encode($product) }})" class="h-10 w-10 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all">
+                    <i class='bx bx-trash text-lg'></i>
+                </button>
+                @endif
+            </div>
+        </div>
+        @endforeach
+        
+         @if($products->isEmpty())
+            <div class="flex flex-col items-center justify-center p-8 bg-white rounded-2xl border border-slate-100 text-center">
+                <i class='bx bx-package text-4xl text-slate-200 mb-2'></i>
+                <p class="text-slate-400 text-sm font-bold">Ürün bulunamadı.</p>
+            </div>
+        @endif
+    </div>
+
+    <!-- Desktop Table -->
+    <div class="hidden md:block bg-white rounded-md border border-slate-100 shadow-sm overflow-x-auto mt-6">
+        <table class="w-full text-left whitespace-nowrap">
             <thead>
                 <tr class="bg-slate-50/50 border-b border-slate-100">
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Ürün / Hizmet Kodu</th>
@@ -104,7 +189,7 @@
                                 @endif
                             </a>
                             <div>
-                                <a href="{{ route('products.show', $product) }}" class="text-sm font-bold text-slate-950 hover:text-indigo-600 hover:underline transition-colors">{{ $product->name }}</a>
+                                <a href="{{ route('products.show', $product) }}" class="text-sm font-bold text-slate-900 hover:text-indigo-600 hover:underline transition-colors">{{ $product->name }}</a>
                                 <p class="text-xs text-slate-500 font-medium">{{ $product->code ?? 'Kod Yok' }}</p>
                             </div>
                         </div>

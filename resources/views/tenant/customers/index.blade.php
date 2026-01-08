@@ -34,8 +34,94 @@
         </div>
     </div>
 
-    <!-- Customers Table -->
-    <div class="bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden">
+    <!-- Mobile Card View -->
+    <div class="block md:hidden space-y-4">
+        @foreach($customers as $customer)
+        <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm space-y-4 {{ $customer->status === 'passive' ? 'opacity-60' : '' }}">
+            <!-- Header: Company & Status -->
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                        <i class='bx bx-buildings text-xl'></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-950">{{ $customer->company_name }}</h3>
+                        @if($customer->company_email)
+                        <p class="text-[10px] text-slate-400 font-medium">{{ $customer->legal_title }}</p>
+                        @endif
+                    </div>
+                </div>
+                <div class="shrink-0">
+                    @if($customer->status === 'active')
+                    <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-50 text-xs font-bold text-emerald-600">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Aktif
+                    </span>
+                    @else
+                    <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-50 text-xs font-bold text-slate-500">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        Pasif
+                    </span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="grid grid-cols-2 gap-3 py-3 border-y border-slate-50">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">İlgili Kişi</p>
+                    <p class="text-xs font-bold text-slate-700">{{ $customer->contact_person ?? '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kategori</p>
+                    <p class="text-xs font-bold text-slate-700">{{ $customer->category ?? 'Genel' }}</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tür</p>
+                    <span class="text-[10px] font-bold uppercase {{ $customer->type === 'legal' ? 'text-indigo-500' : 'text-amber-500' }}">
+                        {{ $customer->type === 'legal' ? 'Tüzel Kişi' : 'Gerçek Kişi' }}
+                    </span>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">İrtibat</p>
+                    <p class="text-xs font-medium text-slate-600">{{ $customer->mobile_phone ?? $customer->landline_phone ?? '-' }}</p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2">
+                @if(auth()->user()->hasPermission('customers.edit'))
+                <a href="{{ route('customers.edit', $customer) }}" class="flex-1 h-9 flex items-center justify-center gap-2 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-bold hover:bg-indigo-100 transition-all">
+                    <i class='bx bx-edit-alt text-base'></i> Düzenle
+                </a>
+                <form action="{{ route('customers.toggle-status', $customer) }}" method="POST" class="flex-1">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="w-full h-9 flex items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all {{ $customer->status === 'active' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' }}">
+                        <i class='bx {{ $customer->status === 'active' ? 'bx-pause-circle' : 'bx-play-circle' }} text-base'></i>
+                        {{ $customer->status === 'active' ? 'Pasife Al' : 'Aktif Et' }}
+                    </button>
+                </form>
+                @endif
+                @if(auth()->user()->hasPermission('customers.delete'))
+                <button type="button" @click="confirmDelete({{ json_encode($customer) }})" class="h-9 w-9 flex items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all">
+                    <i class='bx bx-trash text-base'></i>
+                </button>
+                @endif
+            </div>
+        </div>
+        @endforeach
+
+        @if($customers->isEmpty())
+        <div class="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+            <i class='bx bx-buildings text-4xl text-slate-300 mb-2'></i>
+            <p class="text-slate-400 text-sm font-medium">Henüz müşteri eklenmemiş.</p>
+        </div>
+        @endif
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="hidden md:block bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden">
         <table class="w-full text-left">
             <thead>
                 <tr class="bg-slate-50/50 border-b border-slate-100">

@@ -21,7 +21,7 @@
         <!-- Main Plan Details -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Current Plan Card -->
-            <div class="bg-white p-8 rounded-md border border-slate-100 shadow-sm relative overflow-hidden">
+            <div class="bg-white p-4 md:p-8 rounded-md border border-slate-100 shadow-sm relative overflow-hidden">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                     <div>
                          <div class="flex items-center gap-3 mb-2">
@@ -161,30 +161,30 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-slate-50/50 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            <th class="px-6 py-4">Paket</th>
-                            <th class="px-6 py-4">Tutar</th>
-                            <th class="px-6 py-4">Dönem</th>
-                            <th class="px-6 py-4">Tarih</th>
-                            <th class="px-6 py-4">Durum</th>
+                            <th class="px-4 md:px-6 py-4">Paket</th>
+                            <th class="px-4 md:px-6 py-4">Tutar</th>
+                            <th class="px-4 md:px-6 py-4">Dönem</th>
+                            <th class="px-4 md:px-6 py-4">Tarih</th>
+                            <th class="px-4 md:px-6 py-4">Durum</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         @forelse($attempts as $attempt)
                         <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 <span class="text-sm font-bold text-slate-900">{{ $attempt->plan->name ?? 'Bilinmiyor' }}</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 <span class="text-sm font-bold text-slate-900">₺{{ number_format($attempt->price, 2) }}</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 <span class="text-xs font-bold text-slate-500 uppercase">{{ $attempt->billing_period === 'yearly' ? 'Yıllık' : 'Aylık' }}</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 <div class="text-xs font-bold text-slate-900">{{ $attempt->created_at->format('d.m.Y') }}</div>
                                 <div class="text-[10px] text-slate-400">{{ $attempt->created_at->format('H:i') }}</div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 @if($attempt->status === 'success')
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
                                         <i class='bx bxs-check-circle'></i> Başarılı

@@ -23,7 +23,7 @@
     </div>
 
     <!-- Main Detail Card -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 md:p-8">
         <div class="flex flex-col md:flex-row gap-8">
             <!-- Product Image -->
             <div class="w-full md:w-64 h-64 flex-shrink-0 bg-slate-50 rounded-2xl border border-slate-100 p-2">
@@ -97,49 +97,51 @@
 
         <!-- Proposals Content -->
         <div x-show="tab === 'proposals'" class="bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden">
-             <table class="w-full text-left">
-                <thead>
-                    <tr class="bg-slate-50/50 border-b border-slate-100">
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Tarih</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Teklif No</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Müşteri</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Adet / Tutar</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Durum</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-50">
-                    @forelse($history as $item)
-                    <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="px-6 py-4">
-                            <!-- Assumes Proposal has created_at -->
-                            <p class="text-sm font-bold text-slate-700">{{ $item->proposal->created_at->format('d.m.Y') }}</p>
-                        </td>
-                         <td class="px-6 py-4">
-                            <a href="{{ route('proposals.show', $item->proposal) }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700 hover:underline">
-                                #{{ $item->proposal->proposal_no }}
-                            </a>
-                        </td>
-                         <td class="px-6 py-4">
-                            <p class="text-sm font-bold text-slate-700">{{ $item->proposal->customer->company_name ?? '-' }}</p>
-                        </td>
-                        <td class="px-6 py-4">
-                            <p class="text-sm font-bold text-slate-900">{{ $item->quantity }} {{ $product->unit }}</p>
-                            <span class="text-xs text-slate-500 font-medium">{{ number_format($item->price * $item->quantity, 2) }} {{ $item->currency }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                             <!-- Simple status badge logic (can be refined based on Proposal model) -->
-                            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold uppercase">{{ $item->proposal->status ?? 'Taslak' }}</span>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-slate-400 text-sm font-medium">
-                            Bu ürünle ilgili henüz bir teklif yok.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+             <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-50/50 border-b border-slate-100">
+                            <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Tarih</th>
+                            <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Teklif No</th>
+                            <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Müşteri</th>
+                            <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Adet / Tutar</th>
+                            <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        @forelse($history as $item)
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-4 md:px-6 py-4">
+                                <!-- Assumes Proposal has created_at -->
+                                <p class="text-sm font-bold text-slate-700">{{ $item->proposal->created_at->format('d.m.Y') }}</p>
+                            </td>
+                             <td class="px-4 md:px-6 py-4">
+                                <a href="{{ route('proposals.show', $item->proposal) }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700 hover:underline">
+                                    #{{ $item->proposal->proposal_no }}
+                                </a>
+                            </td>
+                             <td class="px-4 md:px-6 py-4">
+                                <p class="text-sm font-bold text-slate-700">{{ $item->proposal->customer->company_name ?? '-' }}</p>
+                            </td>
+                            <td class="px-4 md:px-6 py-4">
+                                <p class="text-sm font-bold text-slate-900">{{ $item->quantity }} {{ $product->unit }}</p>
+                                <span class="text-xs text-slate-500 font-medium">{{ number_format($item->price * $item->quantity, 2) }} {{ $item->currency }}</span>
+                            </td>
+                            <td class="px-4 md:px-6 py-4 text-right">
+                                 <!-- Simple status badge logic (can be refined based on Proposal model) -->
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold uppercase">{{ $item->proposal->status ?? 'Taslak' }}</span>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-slate-400 text-sm font-medium">
+                                Bu ürünle ilgili henüz bir teklif yok.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+             </div>
         </div>
 
         <!-- Stock Content (Placeholder) -->

@@ -142,7 +142,7 @@
                     <div class="mb-10"></div>
                     @endif
                     
-                    <div class="w-full max-w-2xl grid {{ count($q['options']) <= 4 ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3' }} gap-4">
+                    <div class="w-full max-w-2xl grid {{ count($q['options']) <= 4 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3' }} gap-4">
                         @foreach($q['options'] as $option)
                             <div class="relative">
                                 @if($q['type'] === 'radio')

@@ -32,7 +32,7 @@
     <div 
         x-data="loadingProcess()"
         x-init="start()"
-        class="relative max-w-md w-full bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-500/10 p-10 text-center border border-white/50"
+        class="relative max-w-md w-full bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-500/10 p-6 md:p-10 text-center border border-white/50"
     >
         <!-- Icon Container -->
         <div class="mb-10 relative flex justify-center">

@@ -37,7 +37,7 @@
     }
 }">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
             <h1 class="text-xl font-extrabold text-slate-950 tracking-tight">Kullanıcı Yönetimi</h1>
             <p class="text-slate-500 text-sm mt-1">Ekibinizi yönetin ve yeni alt kullanıcılar ekleyin.</p>
@@ -48,7 +48,7 @@
             @else
                 @click="openAddModal()" 
             @endif
-            class="h-11 px-6 flex items-center gap-2 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 {{ $limitReached ? 'opacity-70' : '' }}"
+            class="w-full md:w-auto h-11 px-6 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 {{ $limitReached ? 'opacity-70' : '' }}"
         >
             <i class='bx bx-user-plus text-xl'></i> Yeni Kullanıcı Ekle
         </button>
@@ -68,89 +68,154 @@
     </div>
     @endif
 
-    <!-- Users Table -->
-    <div class="bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden">
-        <table class="w-full text-left">
-            <thead>
-                <tr class="bg-slate-50/50 border-b border-slate-100">
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kullanıcı</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Rol</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Durum</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">E-posta</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">İşlemler</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
-                @foreach($users as $user)
-                <tr class="hover:bg-slate-50/50 transition-colors {{ $user->status === 'passive' ? 'opacity-60' : '' }}">
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background={{ $user->status === 'passive' ? 'e2e8f0' : 'f1f5f9' }}&color=64748b" class="w-9 h-9 rounded-lg" alt="">
-                            <div>
-                                <p class="text-sm font-bold text-slate-950">{{ $user->name }}</p>
-                                <p class="text-xs text-slate-400">@if($user->position) {{ $user->position }} @else Üye @endif</p>
-                            </div>
+    <!-- Mobile User Cards -->
+    <div class="grid grid-cols-1 gap-4 md:hidden">
+        @foreach($users as $user)
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm relative overflow-hidden {{ $user->status === 'passive' ? 'opacity-75' : '' }}">
+            <div class="flex items-start gap-4">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background={{ $user->status === 'passive' ? 'e2e8f0' : 'f1f5f9' }}&color=64748b" class="w-12 h-12 rounded-xl" alt="">
+                <div class="flex-1 min-w-0">
+                     <div class="flex justify-between items-start">
+                        <div>
+                             <h3 class="text-sm font-bold text-slate-900 truncate pr-6">{{ $user->name }}</h3>
+                             <p class="text-xs text-slate-500 font-medium truncate">{{ $user->email }}</p>
                         </div>
-                    </td>
-                    <td class="px-6 py-4">
+                    </div>
+                     <div class="flex items-center gap-2 mt-2 flex-wrap">
                         @if($user->is_owner)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">
-                            Ana Yönetici
-                        </span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">
+                                Ana Yönetici
+                            </span>
                         @else
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-wider">
-                            Alt Kullanıcı
-                        </span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-wider">
+                                Alt Kullanıcı
+                            </span>
                         @endif
-                    </td>
-                    <td class="px-6 py-4">
-                        @if($user->status === 'active')
-                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            Aktif
-                        </span>
-                        @else
-                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                            Pasif
-                        </span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 text-sm text-slate-600 font-medium">
-                        {{ $user->email }}
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                            <!-- Edit Button -->
-                            <button @click="openEditModal({{ json_encode($user) }})" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="Düzenle">
-                                <i class='bx bx-edit-alt text-lg'></i>
-                            </button>
+                        <span class="text-xs text-slate-400">@if($user->position) • {{ $user->position }} @endif</span>
+                    </div>
+                </div>
+                 <!-- Status Badge (Absolute Top Right) -->
+                <div class="absolute top-4 right-4">
+                     @if($user->status === 'active')
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 block shadow-sm shadow-emerald-200"></span>
+                    @else
+                        <span class="w-2 h-2 rounded-full bg-slate-300 block"></span>
+                    @endif
+                </div>
+            </div>
 
-                            @if(!$user->is_owner)
-                            <!-- Toggle Status Button -->
-                            <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 {{ $user->status === 'active' ? 'hover:text-amber-600 hover:bg-amber-50' : 'hover:text-emerald-600 hover:bg-emerald-50' }} transition-all" title="{{ $user->status === 'active' ? 'Pasife Al' : 'Aktif Et' }}">
-                                    <i class='bx {{ $user->status === 'active' ? 'bx-pause-circle' : 'bx-play-circle' }} text-lg'></i>
-                                </button>
-                            </form>
+            <!-- Mobile Actions -->
+            <div class="grid grid-cols-{{ !$user->is_owner ? '3' : '1' }} gap-2 mt-4 pt-4 border-t border-slate-50">
+                 <button @click="openEditModal({{ json_encode($user) }})" class="h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 text-xs font-bold hover:bg-slate-100 transition-all">
+                    Düzenle
+                </button>
+                @if(!$user->is_owner)
+                <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="contents">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="h-10 flex items-center justify-center rounded-xl {{ $user->status === 'active' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600' }} text-xs font-bold transition-all">
+                        {{ $user->status === 'active' ? 'Pasife Al' : 'Aktif Et' }}
+                    </button>
+                </form>
 
-                            <!-- Delete Button -->
-                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Sil">
-                                    <i class='bx bx-trash text-lg'></i>
-                                </button>
-                            </form>
+                <form action="{{ route('users.destroy', $user) }}" method="POST" class="contents">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')" class="h-10 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 text-xs font-bold transition-all">
+                        Sil
+                    </button>
+                </form>
+                @endif
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <!-- Desktop Table -->
+    <div class="hidden md:block bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kullanıcı</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Rol</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Durum</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">E-posta</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @foreach($users as $user)
+                    <tr class="hover:bg-slate-50/50 transition-colors {{ $user->status === 'passive' ? 'opacity-60' : '' }}">
+                        <td class="px-4 md:px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background={{ $user->status === 'passive' ? 'e2e8f0' : 'f1f5f9' }}&color=64748b" class="w-9 h-9 rounded-lg" alt="">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-950">{{ $user->name }}</p>
+                                    <p class="text-xs text-slate-400">@if($user->position) {{ $user->position }} @else Üye @endif</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4">
+                            @if($user->is_owner)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">
+                                Ana Yönetici
+                            </span>
+                            @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-wider">
+                                Alt Kullanıcı
+                            </span>
                             @endif
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        </td>
+                        <td class="px-4 md:px-6 py-4">
+                            @if($user->status === 'active')
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Aktif
+                            </span>
+                            @else
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                Pasif
+                            </span>
+                            @endif
+                        </td>
+                        <td class="px-4 md:px-6 py-4 text-sm text-slate-600 font-medium">
+                            {{ $user->email }}
+                        </td>
+                        <td class="px-4 md:px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <!-- Edit Button -->
+                                <button @click="openEditModal({{ json_encode($user) }})" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="Düzenle">
+                                    <i class='bx bx-edit-alt text-lg'></i>
+                                </button>
+
+                                @if(!$user->is_owner)
+                                <!-- Toggle Status Button -->
+                                <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 {{ $user->status === 'active' ? 'hover:text-amber-600 hover:bg-amber-50' : 'hover:text-emerald-600 hover:bg-emerald-50' }} transition-all" title="{{ $user->status === 'active' ? 'Pasife Al' : 'Aktif Et' }}">
+                                        <i class='bx {{ $user->status === 'active' ? 'bx-pause-circle' : 'bx-play-circle' }} text-lg'></i>
+                                    </button>
+                                </form>
+
+                                <!-- Delete Button -->
+                                <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Sil">
+                                        <i class='bx bx-trash text-lg'></i>
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Limit Reached Modal -->

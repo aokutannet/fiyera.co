@@ -9,19 +9,22 @@
             <p class="text-slate-500 text-sm font-medium">Teklif ve performans analizlerinizi tek bir yerden takip edin.</p>
         </div>
         
-        <form id="filterForm" action="{{ route('reports.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
-            <div class="bg-white p-1 rounded-xl border border-slate-200 flex items-center">
-                <button type="submit" name="filter" value="today" class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $filter === 'today' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }}">Bugün</button>
-                <button type="submit" name="filter" value="week" class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $filter === 'week' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }}">Bu Hafta</button>
-                <button type="submit" name="filter" value="this_month" class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $filter === 'this_month' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }}">Bu Ay</button>
+        <form id="filterForm" action="{{ route('reports.index') }}" method="GET" class="w-full md:w-auto">
+            <div class="bg-white p-1 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center gap-2 md:gap-0">
+                <div class="flex items-center w-full md:w-auto gap-1 p-1 md:p-0 overflow-x-auto">
+                    <button type="submit" name="filter" value="today" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all {{ $filter === 'today' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }}">Bugün</button>
+                    <button type="submit" name="filter" value="week" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all {{ $filter === 'week' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }}">Bu Hafta</button>
+                    <button type="submit" name="filter" value="this_month" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all {{ $filter === 'this_month' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }}">Bu Ay</button>
+                </div>
                 
-                <div class="h-4 w-px bg-slate-200 mx-2"></div>
+                <div class="hidden md:block h-4 w-px bg-slate-200 mx-2"></div>
+                <div class="md:hidden w-full h-px bg-slate-100 my-1"></div>
                 
-                <div class="flex items-center gap-2 px-2" x-data>
-                     <input type="date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" class="text-xs font-bold text-slate-600 bg-transparent outline-none border-b border-transparent focus:border-indigo-500 transition-all w-28">
+                <div class="flex items-center justify-between md:justify-start gap-2 px-2 w-full md:w-auto pb-1 md:pb-0" x-data>
+                     <input type="date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" class="flex-1 md:flex-none text-xs font-bold text-slate-600 bg-transparent outline-none border-b border-transparent focus:border-indigo-500 transition-all md:w-28 text-center md:text-left">
                      <span class="text-slate-300">-</span>
-                     <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="text-xs font-bold text-slate-600 bg-transparent outline-none border-b border-transparent focus:border-indigo-500 transition-all w-28">
-                     <button type="submit" name="filter" value="custom" class="w-6 h-6 flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all">
+                     <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="flex-1 md:flex-none text-xs font-bold text-slate-600 bg-transparent outline-none border-b border-transparent focus:border-indigo-500 transition-all md:w-28 text-center md:text-left">
+                     <button type="submit" name="filter" value="custom" class="w-6 h-6 flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all flex-shrink-0">
                         <i class='bx bx-check'></i>
                      </button>
                 </div>
@@ -76,7 +79,7 @@
     </div>
 
     <!-- Revenue Trend Chart -->
-    <div class="bg-white p-8 rounded-md border border-slate-100 shadow-sm">
+    <div class="bg-white p-4 md:p-8 rounded-md border border-slate-100 shadow-sm">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h3 class="text-lg font-black text-slate-950">Gelir Trendi</h3>
@@ -93,15 +96,49 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Status Chart -->
-        <div class="bg-white p-8 rounded-md border border-slate-100 shadow-sm h-fit">
+        <div class="bg-white p-4 md:p-8 rounded-md border border-slate-100 shadow-sm h-fit">
             <h3 class="text-lg font-black text-slate-950 mb-6">Teklif Durum Dağılımı</h3>
             <div id="statusChart" class="min-h-[300px]"></div>
         </div>
 
         <!-- User Performance Table -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-md border border-slate-100 shadow-sm flex flex-col h-fit">
+        <div class="lg:col-span-2 bg-white p-4 md:p-8 rounded-md border border-slate-100 shadow-sm flex flex-col h-fit">
             <h3 class="text-lg font-black text-slate-950 mb-6">Ekip Performansı</h3>
-            <div class="overflow-x-auto -mx-8 px-8 flex-1">
+            
+            <!-- Mobile Card View -->
+            <div class="space-y-4 md:hidden">
+                @foreach($userPerformance as $user)
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                    <div class="flex items-center gap-3 mb-3">
+                        <img src="{{ $user['avatar'] }}" class="w-10 h-10 rounded-xl bg-slate-200" alt="">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-bold text-slate-900">{{ $user['name'] }}</p>
+                                <span class="text-xs font-bold {{ $user['conversion_rate'] >= 50 ? 'text-emerald-600' : ($user['conversion_rate'] >= 25 ? 'text-amber-600' : 'text-slate-500') }} bg-white px-2 py-1 rounded border border-slate-100">
+                                     %{{ number_format($user['conversion_rate'], 1) }}
+                                </span>
+                            </div>
+                             <div class="w-full h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden">
+                                <div class="h-full bg-indigo-500 rounded-full" style="width: {{ $user['conversion_rate'] }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-white p-2 rounded border border-slate-100 text-center">
+                            <span class="block text-slate-400 font-bold mb-0.5">Teklif/Onay</span>
+                            <span class="font-bold text-slate-700">{{ $user['approved_proposals'] }} / {{ $user['total_proposals'] }}</span>
+                        </div>
+                         <div class="bg-white p-2 rounded border border-slate-100 text-center">
+                            <span class="block text-slate-400 font-bold mb-0.5">Ciro</span>
+                            <span class="font-black text-slate-900">{{ number_format($user['revenue'], 2) }} ₺</span>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto -mx-8 px-8 flex-1">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-slate-100">
@@ -148,11 +185,31 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         <!-- Top Products -->
-        <div class="bg-white p-8 rounded-md border border-slate-100 shadow-sm h-fit">
+        <div class="bg-white p-4 md:p-8 rounded-md border border-slate-100 shadow-sm h-fit">
             <h3 class="text-lg font-black text-slate-950 mb-6 flex items-center gap-2">
                 <i class='bx bxs-star text-amber-400'></i> En Çok Satan Ürünler/Hizmetler
             </h3>
-            <div class="overflow-x-auto">
+            
+            <!-- Mobile Card View -->
+            <div class="space-y-3 md:hidden">
+                @forelse($topProducts as $product)
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-slate-700 text-sm truncate mb-1">{{ $product->description }}</p>
+                        <span class="text-xs font-bold text-slate-500">{{ number_format($product->total_qty, 0) }} Adet Satıldı</span>
+                    </div>
+                    <div class="text-right whitespace-nowrap">
+                        <p class="font-black text-slate-900 text-sm">{{ number_format($product->total_revenue, 2) }} ₺</p>
+                        <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded">Gelir</span>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center text-slate-400 text-sm py-4 italic">Veri bulunamadı.</div>
+                @endforelse
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="border-b border-slate-100">
@@ -177,11 +234,31 @@
         </div>
 
         <!-- Top Customers -->
-        <div class="bg-white p-8 rounded-md border border-slate-100 shadow-sm h-fit">
+        <div class="bg-white p-4 md:p-8 rounded-md border border-slate-100 shadow-sm h-fit">
             <h3 class="text-lg font-black text-slate-950 mb-6 flex items-center gap-2">
                 <i class='bx bxs-crown text-indigo-400'></i> En İyi Müşteriler
             </h3>
-             <div class="overflow-x-auto">
+            
+            <!-- Mobile Card View -->
+            <div class="space-y-3 md:hidden">
+                @forelse($topCustomers as $customer)
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-slate-700 text-sm truncate mb-1">{{ $customer->company_name }}</p>
+                        <span class="text-xs font-bold text-slate-500">{{ $customer->approved_count }} Onaylı Teklif</span>
+                    </div>
+                    <div class="text-right whitespace-nowrap">
+                        <p class="font-black text-slate-900 text-sm">{{ number_format($customer->total_revenue, 2) }} ₺</p>
+                        <span class="text-[10px] font-bold text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded">Toplam</span>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center text-slate-400 text-sm py-4 italic">Veri bulunamadı.</div>
+                @endforelse
+            </div>
+
+             <!-- Desktop Table View -->
+             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="border-b border-slate-100">

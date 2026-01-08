@@ -14,11 +14,11 @@
                 </a>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">Paket Seçimi</h1>
             </div>
-            <p class="text-slate-500 font-medium ml-8">İşletmeniz için en uygun paketi seçin ve hemen kullanmaya başlayın.</p>
+            <p class="text-slate-500 font-medium md:ml-8">İşletmeniz için en uygun paketi seçin ve hemen kullanmaya başlayın.</p>
         </div>
         
         <!-- Billing Cycle Toggle -->
-        <div class="inline-flex bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm ml-8 md:ml-0">
+        <div class="hidden md:inline-flex bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm ml-8 md:ml-0">
             <button 
                 @click="billing = 'monthly'"
                 class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all"
@@ -34,6 +34,27 @@
                 Yıllık
                 <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide">
                     %20 İndirim
+                </span>
+            </button>
+        </div>
+
+        <!-- Mobile Billing Toggle -->
+        <div class="md:hidden w-full bg-white p-1 rounded-xl border border-slate-200 shadow-sm flex">
+            <button 
+                @click="billing = 'monthly'"
+                class="flex-1 py-3 rounded-lg text-sm font-bold transition-all text-center"
+                :class="billing === 'monthly' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500'"
+            >
+                Aylık
+            </button>
+            <button 
+                @click="billing = 'yearly'"
+                class="flex-1 py-3 rounded-lg text-sm font-bold transition-all text-center flex items-center justify-center gap-1"
+                :class="billing === 'yearly' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500'"
+            >
+                Yıllık
+                <span class="text-[9px] bg-emerald-100 text-emerald-700 px-1 py-0.5 rounded font-extrabold uppercase">
+                    -%20
                 </span>
             </button>
         </div>

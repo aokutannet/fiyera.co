@@ -66,53 +66,55 @@
 
     <!-- Categories List -->
     <div class="bg-white rounded-md border border-slate-100 shadow-sm overflow-hidden">
-        <table class="w-full text-left">
-            <thead>
-                <tr class="bg-slate-50/50 border-b border-slate-100">
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kategori Adı</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Açıklama</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Ürün Sayısı</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">İşlemler</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
-                @foreach($categories as $category)
-                <tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="px-6 py-4">
-                        <span class="text-sm font-bold text-slate-900">{{ $category->name }}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="text-sm text-slate-500 font-medium">{{ $category->description ?? '-' }}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700">
-                            {{ $category->products_count }} Ürün
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                            <button @click="openEditModal({{ json_encode($category) }})" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="Düzenle">
-                                <i class='bx bx-edit-alt text-lg'></i>
-                            </button>
-                            <button @click="openDeleteModal({{ json_encode($category) }})" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Sil">
-                                <i class='bx bx-trash text-lg'></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-                @if($categories->isEmpty())
-                <tr>
-                    <td colspan="4" class="px-6 py-12 text-center">
-                        <div class="flex flex-col items-center gap-3">
-                            <i class='bx bx-category text-4xl text-slate-200'></i>
-                            <p class="text-slate-400 text-sm font-medium">Henüz kategori eklenmemiş.</p>
-                        </div>
-                    </td>
-                </tr>
-                @endif
-            </tbody>
-        </table>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kategori Adı</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Açıklama</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Ürün Sayısı</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @foreach($categories as $category)
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-4 md:px-6 py-4">
+                            <span class="text-sm font-bold text-slate-900">{{ $category->name }}</span>
+                        </td>
+                        <td class="px-4 md:px-6 py-4">
+                            <span class="text-sm text-slate-500 font-medium">{{ $category->description ?? '-' }}</span>
+                        </td>
+                        <td class="px-4 md:px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700">
+                                {{ $category->products_count }} Ürün
+                            </span>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button @click="openEditModal({{ json_encode($category) }})" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="Düzenle">
+                                    <i class='bx bx-edit-alt text-lg'></i>
+                                </button>
+                                <button @click="openDeleteModal({{ json_encode($category) }})" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Sil">
+                                    <i class='bx bx-trash text-lg'></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                    @if($categories->isEmpty())
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <i class='bx bx-category text-4xl text-slate-200'></i>
+                                <p class="text-slate-400 text-sm font-medium">Henüz kategori eklenmemiş.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endif
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Create/Edit Modal -->

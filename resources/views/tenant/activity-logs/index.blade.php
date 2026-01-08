@@ -16,18 +16,18 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-100">
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kullanıcı</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">İşlem Türü</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">İlgili Kayıt</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Açıklama</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Tarih</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Detay/İşlemler</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kullanıcı</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">İşlem Türü</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">İlgili Kayıt</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Açıklama</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Tarih</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Detay/İşlemler</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     @forelse($logs as $log)
                         <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-bold ring-2 ring-white">
                                         {{ $log->user ? substr($log->user->name, 0, 2) : 'S' }}
@@ -38,7 +38,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 @php
                                     $eventColors = [
                                         'created' => 'text-emerald-600 bg-emerald-50',
@@ -55,7 +55,7 @@
                                     {{ $eventLabels[$log->event] ?? ucfirst($log->event) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 @php
                                     $subjectMap = [
                                         'Product' => 'Ürün',
@@ -73,14 +73,14 @@
                                 </p>
                                 <p class="text-[10px] text-slate-400 font-medium">ID: #{{ $log->subject_id }}</p>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 <p class="text-sm text-slate-600 font-medium">{{ $log->description }}</p>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4">
                                 <p class="text-sm font-bold text-slate-600">{{ $log->created_at->format('d.m.Y') }}</p>
                                 <p class="text-[10px] text-slate-400 font-medium">{{ $log->created_at->format('H:i') }}</p>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-4 md:px-6 py-4 text-right">
                                 <a href="{{ route('activity-logs.show', $log->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="İncele">
                                     <i class='bx bx-show text-lg'></i>
                                 </a>

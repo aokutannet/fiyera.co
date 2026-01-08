@@ -10,9 +10,9 @@
      x-data="proposalForm()">
     
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div class="flex items-center gap-4">
-            <a href="{{ route('proposals.index') }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all shadow-sm">
+            <a href="{{ route('proposals.index') }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 transition-all shadow-sm flex-shrink-0">
                 <i class='bx bx-chevron-left text-2xl'></i>
             </a>
             <div>
@@ -44,8 +44,9 @@
             <!-- Sol Kolon: Teklif Bilgileri -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Temel Bilgiler -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm space-y-6">
+                <div class="bg-white rounded-md p-5 md:p-8 border border-slate-100 shadow-sm space-y-6">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">Teklif Başlığı & Müşteri</h3>
+
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="col-span-2">
@@ -55,14 +56,9 @@
                                 placeholder="Örn: 2024 Yazılım Geliştirme Hizmeti">
                         </div>
 
-                        <div>
-                            <div class="flex items-center justify-between mb-2 px-1">
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">MÜŞTERİ SEÇİMİ <span class="text-rose-500">*</span></label>
-                                <button type="button" @click="$dispatch('open-modal', 'new-customer-modal')" 
-                                    class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-bold hover:bg-indigo-100 transition-all border border-indigo-100">
-                                    <i class='bx bx-plus-circle'></i> YENİ MÜŞTERİ EKLE
-                                </button>
-                            </div>
+                        <div class="relative">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">MÜŞTERİ SEÇİMİ <span class="text-rose-500">*</span></label>
+                            
                             <select name="customer_id" id="customer_select" required class="w-full">
                                 <option value="">Müşteri Seçin...</option>
                                 @foreach($customers as $customer)
@@ -71,6 +67,11 @@
                                     </option>
                                 @endforeach
                             </select>
+
+                            <button type="button" @click="$dispatch('open-modal', 'new-customer-modal')" 
+                                class="w-full mt-3 sm:mt-0 sm:w-auto sm:absolute sm:top-0 sm:right-0 justify-center flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-bold hover:bg-indigo-100 transition-all border border-indigo-100">
+                                <i class='bx bx-plus-circle'></i> YENİ MÜŞTERİ EKLE
+                            </button>
                         </div>
 
                         <div>
@@ -85,8 +86,9 @@
                 </div>
 
                 <!-- Teklif Kalemleri -->
-                <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-3xl p-5 md:p-8 border border-slate-100 shadow-sm">
                     <div class="flex items-center justify-between mb-8 border-b border-slate-50 pb-4">
+
                         <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Teklif Kalemleri</h3>
                         <button type="button" @click="addItem()" class="h-9 px-4 rounded-xl bg-indigo-50 text-indigo-600 text-xs font-bold hover:bg-indigo-100 transition-all flex items-center gap-2">
                             <i class='bx bx-plus'></i> Kalem Ekle
@@ -95,10 +97,11 @@
 
                     <div class="space-y-4">
                         <template x-for="(item, index) in items" :key="index">
-                            <div class="p-6 rounded-3xl bg-slate-50/50 border border-slate-100 relative group animate-in fade-in slide-in-from-left-4 space-y-4">
+                            <div class="p-4 md:p-6 rounded-3xl bg-slate-50/50 border border-slate-100 relative group animate-in fade-in slide-in-from-left-4 space-y-4">
                                 <!-- Ana Satır -->
-                                <div class="grid grid-cols-12 gap-5">
+                                <div class="grid grid-cols-12 gap-3 md:gap-5">
                                     <div class="col-span-12 lg:col-span-5">
+
                                         <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 px-1">Ürün / Açıklama</label>
                                         <div class="relative">
                                             <input type="text" x-init="initProductSelect($el, index)" 
@@ -175,8 +178,8 @@
                                      x-transition:enter="transition ease-out duration-200"
                                      x-transition:enter-start="opacity-0 -translate-y-2"
                                      x-transition:enter-end="opacity-100 translate-y-0"
-                                     class="flex items-center gap-6 p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100/50">
-                                    <div class="flex items-center gap-3">
+                                     class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100/50">
+                                    <div class="flex items-center justify-between w-full sm:w-auto gap-3">
                                         <span class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">İndirim Türü:</span>
                                         <div class="flex bg-white rounded-lg p-1 border border-indigo-100">
                                             <button type="button" @click="item.discount_type = 'fixed'" 
@@ -188,7 +191,7 @@
                                             <input type="hidden" :name="`items[${index}][discount_type]`" x-model="item.discount_type">
                                         </div>
                                     </div>
-                                    <div class="flex-1 max-w-[200px]">
+                                    <div class="w-full sm:flex-1 sm:max-w-[200px]">
                                         <div class="relative">
                                             <input type="number" step="0.01" :name="`items[${index}][discount_value]`" x-model="item.discount_value"
                                                 class="w-full h-10 px-4 rounded-xl bg-white border border-indigo-100 text-xs font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all"
@@ -196,7 +199,7 @@
                                             <div class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-indigo-300" x-text="item.discount_type === 'percentage' ? '%' : '₺'"></div>
                                         </div>
                                     </div>
-                                    <div class="text-[10px] font-bold text-slate-400">
+                                    <div class="w-full sm:w-auto text-right sm:text-left text-[10px] font-bold text-slate-400">
                                         Satır İndirimi: <span class="text-indigo-600 font-black" x-text="formatCurrency(calculateLineDiscount(item))"></span>
                                     </div>
                                 </div>
@@ -206,8 +209,9 @@
                 </div>
 
                 <!-- Notlar -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-md p-5 md:p-8 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">Teklif Notları & Şartlar</h3>
+
                     <textarea name="notes" rows="4" 
                         class="w-full p-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all"
                         placeholder="Örn: Ödeme teklif onayından sonra 7 iş günü içerisinde peşin olarak yapılacaktır.">{{ old('notes') }}</textarea>
@@ -217,8 +221,9 @@
             <!-- Sağ Kolon: Tarihler ve Özet -->
             <div class="space-y-8">
                 <!-- Tarih ve Ek Bilgiler -->
-                <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm space-y-6">
+                <div class="bg-white rounded-md p-5 md:p-8 border border-slate-100 shadow-sm space-y-6">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">Tarih & Ödeme</h3>
+
                     
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Teklif Tarihi <span class="text-rose-500">*</span></label>
@@ -250,8 +255,9 @@
                 </div>
 
                 <!-- Özet Bilgiler -->
-                <div class="bg-slate-900 rounded-2xl p-8 shadow-2xl shadow-slate-200 relative overflow-hidden">
+                <div class="bg-slate-900 rounded-2xl p-6 md:p-8 shadow-2xl shadow-slate-200 relative overflow-hidden">
                     <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 opacity-10">
+
                         <i class='bx bx-receipt text-[160px] text-white rotate-12'></i>
                     </div>
 
@@ -327,8 +333,9 @@
      class="fixed inset-0 z-[100] overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="open = false"></div>
-        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden border border-slate-100 p-10">
+        <div class="bg-white rounded-3xl md:rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden border border-slate-100 p-6 md:p-10">
             <div class="flex items-center justify-between mb-8">
+
                 <h3 class="text-2xl font-black text-slate-950 tracking-tight">Hızlı Müşteri Ekle</h3>
                 <button @click="open = false" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-50 text-slate-400 transition-all">
                     <i class='bx bx-x text-2xl'></i>

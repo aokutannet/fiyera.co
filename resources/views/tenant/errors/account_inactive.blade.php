@@ -31,7 +31,7 @@
                 </div>
 
                 <!-- Card -->
-                <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/40 text-center">
+                <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/40 text-center">
                     
                     @if($reason === 'suspended')
                         <div class="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">

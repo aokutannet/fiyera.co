@@ -41,7 +41,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2">
                     
                     <!-- Left Column: Form Area -->
-                    <div class="p-8 md:p-10 lg:p-12 bg-white">
+                    <div class="p-6 md:p-10 lg:p-12 bg-white">
                         <form id="payment-form" action="{{ route('subscription.store') }}" method="POST" class="space-y-10">
                             @csrf
                             <input type="hidden" name="plan_id" value="{{ $selectedPlan->id }}">
@@ -188,7 +188,7 @@
                     </div>
 
                     <!-- Right Column: Order Summary -->
-                    <div class="bg-indigo-50/50 p-8 md:p-10 lg:p-12 border-t md:border-t-0 md:border-l border-slate-100 flex flex-col justify-between">
+                    <div class="bg-indigo-50/50 p-6 md:p-10 lg:p-12 border-t md:border-t-0 md:border-l border-slate-100 flex flex-col justify-between">
                         <div>
                             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">{{ __('Sipariş Özeti') }}</h3>
                             

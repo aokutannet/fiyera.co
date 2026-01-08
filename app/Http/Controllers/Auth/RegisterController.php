@@ -25,6 +25,7 @@ class RegisterController extends Controller
     {
         $key = 'register|'.$request->ip();
 
+        /*
         if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
             return back()->withErrors([
@@ -33,6 +34,7 @@ class RegisterController extends Controller
         }
 
         \Illuminate\Support\Facades\RateLimiter::hit($key, 3600);
+        */
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -72,7 +74,11 @@ class RegisterController extends Controller
             $dbName = "tenant_{$tenant->id}_teklif";
             Config::set("database.connections.tenant_temp", array_merge(
                 Config::get('database.connections.mysql'),
-                ['database' => $dbName]
+                [
+                    'database' => $dbName,
+                    'username' => config('database.connections.tenant.username', config('database.connections.mysql.username')),
+                    'password' => config('database.connections.tenant.password', config('database.connections.mysql.password')),
+                ]
             ));
 
             DB::connection('tenant_temp')->table('users')->insert([

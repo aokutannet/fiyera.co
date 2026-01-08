@@ -33,7 +33,7 @@
         @csrf
         
         <!-- Tür Seçimi Card -->
-        <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm space-y-6">
+        <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm space-y-6">
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Müşteri Türü</label>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -77,7 +77,7 @@
         </div>
 
         <!-- Temel Bilgiler Card -->
-        <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+        <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm">
             <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-8 border-b border-slate-50 pb-4">Temel Bilgiler</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -119,8 +119,8 @@
         </div>
 
         <!-- İletişim & Vergi Bilgileri Card -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm h-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+            <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm h-full">
                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">İletişim</h3>
                 <div class="space-y-6">
                     <div>
@@ -138,7 +138,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm h-full">
+            <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm h-full">
                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">Vergi Bilgileri</h3>
                 <div class="space-y-6">
                     <div>
@@ -158,7 +158,7 @@
         </div>
 
         <!-- Adres Bilgileri Card -->
-        <div class="bg-white rounded-md p-8 border border-slate-100 shadow-sm">
+        <div class="bg-white rounded-md p-4 md:p-8 border border-slate-100 shadow-sm">
             <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-8 border-b border-slate-50 pb-4">Adres Bilgileri</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

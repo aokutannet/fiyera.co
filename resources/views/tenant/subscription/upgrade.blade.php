@@ -186,7 +186,7 @@
                 <!-- Left: Payment Form -->
                 <div class="lg:col-span-8 space-y-6">
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
-                        <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                        <div class="p-4 md:p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
                                 <i class='bx bxs-credit-card text-indigo-600 text-xl'></i>
                                 Güvenli Ödeme
@@ -197,7 +197,7 @@
                             </div>
                         </div>
                         
-                        <div class="p-8">
+                        <div class="p-4 md:p-8">
                             <form id="payment-form" action="{{ route('subscription.store') }}" method="POST" class="space-y-6">
                                 @csrf
                                 <input type="hidden" name="plan_id" value="{{ $selectedPlan->id }}">
@@ -219,7 +219,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="grid grid-cols-2 gap-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div class="space-y-1">
                                             <label class="text-xs font-bold text-slate-700 uppercase tracking-wide ml-1">Son Kullanma</label>
                                             <input type="text" placeholder="AA / YY" class="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition-all outline-none placeholder:text-slate-300">

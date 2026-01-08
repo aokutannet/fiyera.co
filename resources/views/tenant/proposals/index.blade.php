@@ -1,6 +1,20 @@
 @extends('tenant.layouts.app')
 
 @section('content')
+@php
+    $statusColors = [
+        'draft' => 'text-slate-500 bg-slate-50',
+        'pending' => 'text-amber-600 bg-amber-50',
+        'approved' => 'text-emerald-600 bg-emerald-50',
+        'rejected' => 'text-rose-600 bg-rose-50',
+    ];
+    $statusLabels = [
+        'draft' => 'Taslak',
+        'pending' => 'Onay Bekliyor',
+        'approved' => 'Onaylandı',
+        'rejected' => 'Reddedildi',
+    ];
+@endphp
 <div class="space-y-8" x-data="{ 
     deleteProposal: null,
     isLimitModalOpen: false,
@@ -68,8 +82,81 @@
         </a>
     </div>
 
-    <!-- Proposals Table -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <!-- Proposals Mobile List -->
+    <div class="md:hidden space-y-4">
+        @foreach($proposals as $proposal)
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <!-- Header -->
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                            <i class='bx bx-file text-xl'></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-extrabold text-slate-950 truncate">{{ $proposal->proposal_number }}</p>
+                            <p class="text-xs text-slate-500 font-bold truncate">{{ $proposal->title }}</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 {{ $statusColors[$proposal->status] ?? $statusColors['draft'] }}">
+                        {{ $statusLabels[$proposal->status] ?? $proposal->status }}
+                    </span>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1">MÜŞTERİ</p>
+                        <p class="text-xs font-bold text-slate-900 truncate">{{ $proposal->customer->company_name }}</p>
+                        <p class="text-[10px] text-slate-500 font-medium truncate">{{ $proposal->customer->contact_person }}</p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                         <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1">TUTAR</p>
+                         <p class="text-sm font-black text-slate-900">{{ number_format($proposal->total_amount, 2) }}</p>
+                         <p class="text-[10px] text-slate-500 font-bold">{{ $proposal->currency }}</p>
+                    </div>
+                </div>
+
+                <!-- Footer / Actions -->
+                <div class="flex items-center justify-between pt-3 border-t border-slate-50">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">TARİH</span>
+                        <span class="text-xs font-bold text-slate-600">{{ $proposal->proposal_date->format('d.m.Y') }}</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-1">
+                         @if(auth()->user()->hasPermission('proposals.edit'))
+                            <a href="{{ route('proposals.edit', $proposal) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50" >
+                                <i class='bx bx-edit-alt text-lg'></i>
+                            </a>
+                        @endif
+                        <a href="{{ route('proposals.show', $proposal) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50" >
+                            <i class='bx bx-show text-lg'></i>
+                        </a>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50">
+                            <i class='bx bx-envelope text-lg'></i>
+                        </button>
+                         <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
+                            <i class='bx bx-message-square-dots text-lg'></i>
+                        </button>
+                        @if(auth()->user()->hasPermission('proposals.delete'))
+                            <button @click="confirmDelete({{ json_encode(['id' => $proposal->id, 'number' => $proposal->proposal_number]) }})" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50">
+                                <i class='bx bx-trash text-lg'></i>
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endforeach
+         @if($proposals->isEmpty())
+                <div class="flex flex-col items-center gap-3 py-12 text-center">
+                    <i class='bx bx-file text-4xl text-slate-200'></i>
+                    <p class="text-slate-400 text-sm font-medium">Henüz teklif bulunamadı.</p>
+                </div>
+        @endif
+    </div>
+
+    <!-- Proposals Table (Desktop) -->
+    <div class="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table class="w-full text-left">
             <thead>
                 <tr class="bg-slate-50/50 border-b border-slate-100">
@@ -117,20 +204,6 @@
                         <p class="text-[10px] text-slate-400 font-medium">{{ $proposal->items_count ?? $proposal->items()->count() }} Kalem</p>
                     </td>
                     <td class="px-6 py-4">
-                        @php
-                            $statusColors = [
-                                'draft' => 'text-slate-500 bg-slate-50',
-                                'pending' => 'text-amber-600 bg-amber-50',
-                                'approved' => 'text-emerald-600 bg-emerald-50',
-                                'rejected' => 'text-rose-600 bg-rose-50',
-                            ];
-                            $statusLabels = [
-                                'draft' => 'Taslak',
-                                'pending' => 'Onay Bekliyor',
-                                'approved' => 'Onaylandı',
-                                'rejected' => 'Reddedildi',
-                            ];
-                        @endphp
                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $statusColors[$proposal->status] ?? $statusColors['draft'] }}">
                             {{ $statusLabels[$proposal->status] ?? $proposal->status }}
                         </span>

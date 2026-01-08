@@ -47,10 +47,10 @@
                 
                 <!-- Profile Section -->
                 <div class="bg-white rounded-md border border-slate-100 overflow-hidden shadow-sm">
-                    <div class="px-8 py-6 border-b border-slate-50">
+                    <div class="px-4 md:px-8 py-6 border-b border-slate-50">
                         <h2 class="text-lg font-bold text-slate-950">Kişisel Bilgiler</h2>
                     </div>
-                    <div class="p-8 space-y-6">
+                    <div class="p-4 md:p-8 space-y-6">
                         <div class="flex items-center gap-6 mb-4">
                             <div class="relative group">
                                 <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0f172a&color=fff&size=128" class="w-24 h-24 rounded-3xl object-cover ring-4 ring-slate-50 group-hover:ring-slate-100 transition-all shadow-lg shadow-slate-200" alt="Avatar">
@@ -66,7 +66,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Ad Soyad</label>
                                 <input type="text" name="name" value="{{ old('name', $user->name) }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all @error('name') border-rose-500 @enderror">
@@ -82,7 +82,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Telefon</label>
                                 <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="+90 5XX XXX XX XX" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all @error('phone') border-rose-500 @enderror">
@@ -105,11 +105,11 @@
 
                 <!-- Password Section -->
                 <div class="bg-white rounded-md border border-slate-100 overflow-hidden shadow-sm">
-                    <div class="px-8 py-6 border-b border-slate-50">
+                    <div class="px-4 md:px-8 py-6 border-b border-slate-50">
                         <h2 class="text-lg font-bold text-slate-950">Güvenlik ve Şifre</h2>
                         <p class="text-slate-400 text-xs mt-1 italic">Boş bırakırsanız şifreniz değişmeyecektir.</p>
                     </div>
-                    <div class="p-8 space-y-6">
+                    <div class="p-4 md:p-8 space-y-6">
                         <!-- 2FA Toggle -->
                         <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
                             <div class="flex gap-4 items-center">
@@ -137,7 +137,7 @@
                             @error('current_password') <p class="text-[11px] text-rose-500 font-bold mt-1 ml-1">{{ $message }}</p> @enderror
                         </div>
 
-                        <div class="grid grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Yeni Şifre</label>
                                 <input type="password" name="password" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all @error('password') border-rose-500 @enderror">
