@@ -94,10 +94,24 @@
         }
     </style>
 </head>
-<body class="bg-[#fafafa] text-slate-950 font-medium">
+<body class="bg-[#fafafa] text-slate-950 font-medium" x-data="{ mobileSidebarOpen: false }">
     <div class="flex min-h-screen">
+        <!-- Mobile Overlay -->
+        <div x-show="mobileSidebarOpen" 
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-slate-900/50 z-[60] lg:hidden backdrop-blur-sm" 
+             @click="mobileSidebarOpen = false" 
+             x-cloak></div>
+
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-[var(--sidebar-width)] bg-white flex flex-col fixed h-full border-r border-gray-100 z-50 sidebar-transition">
+        <aside id="sidebar" 
+               :class="mobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0 lg:shadow-none'"
+               class="w-[280px] lg:w-[var(--sidebar-width)] bg-white flex flex-col fixed inset-y-0 left-0 h-full border-r border-gray-100 z-[70] sidebar-transition transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0">
             <div class="p-6 flex flex-col h-full sidebar-content">
                 <!-- Brand -->
                  <a href="{{ route('dashboard') }}">
@@ -108,8 +122,12 @@
                         </div>
                         <span class="font-extrabold text-xl tracking-tight text-slate-950 sidebar-brand-text sidebar-transition whitespace-nowrap">fiyera<span class="text-indigo-600">.co</span></span>
                     </div>
-                    <button id="sidebarToggle" class="sidebar-toggle-btn w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-50 text-slate-400 hover:text-slate-950 transition-all">
+                    <button id="sidebarToggle" class="hidden lg:flex sidebar-toggle-btn w-8 h-8 items-center justify-center rounded-lg hover:bg-slate-50 text-slate-400 hover:text-slate-950 transition-all">
                         <i class='bx bx-chevron-left text-xl' id="toggle-icon"></i>
+                    </button>
+                    <!-- Mobile Close Button -->
+                    <button @click="mobileSidebarOpen = false" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-50 text-slate-400 hover:text-slate-950 transition-all">
+                        <i class='bx bx-x text-2xl'></i>
                     </button>
                 </div>
                 </a>
@@ -221,7 +239,7 @@
                              x-transition:leave="transition ease-in duration-150"
                              x-transition:leave-start="opacity-100 translate-x-0 scale-100"
                              x-transition:leave-end="opacity-0 translate-x-4 scale-95"
-                             class="fixed left-[calc(var(--sidebar-width)+8px)] bottom-6 w-64 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-slate-100 p-2 z-[9999] sidebar-profile-dropdown"
+                             class="fixed left-4 lg:left-[calc(var(--sidebar-width)+8px)] bottom-20 lg:bottom-6 w-60 lg:w-64 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-slate-100 p-2 z-[9999] sidebar-profile-dropdown"
                              x-cloak>
                              <div class="px-3 py-2 border-b border-slate-50 mb-1">
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">{{ __('Hesap Ayarları') }}</p>
@@ -255,16 +273,29 @@
         </aside>
 
         <!-- Main Content -->
-        <main id="main-content" class="flex-1 ml-[var(--sidebar-width)] sidebar-transition">
+        <main id="main-content" class="flex-1 w-full ml-0 lg:ml-[var(--sidebar-width)] sidebar-transition min-w-0">
             <!-- Top Header -->
-            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 px-8 flex items-center justify-between">
-                <div id="header-search" class="flex items-center gap-4 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 w-96">
-                    <i class='bx bx-search text-slate-400 text-xl'></i>
-                    <input type="text" placeholder="{{ __('Teklif veya Müşteri Ara...') }}" class="bg-transparent border-none outline-none text-sm font-medium w-full placeholder:text-slate-400">
-                    <span class="text-[10px] font-bold text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-100">⌘K</span>
+            <header class="h-16 lg:h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 px-4 lg:px-8 flex items-center justify-between">
+                <div class="flex items-center gap-2 lg:gap-4">
+                    <!-- Mobile Menu Button & Brand -->
+                    <div class="flex items-center gap-3 lg:hidden">
+                         <div class="w-9 h-9 bg-slate-950 rounded-xl flex items-center justify-center shadow-lg shadow-slate-200 flex-shrink-0">
+                            <i class='bx bxs-bolt text-white text-xl'></i>
+                        </div>
+                        <button @click="mobileSidebarOpen = true" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-50 active:bg-slate-100 transition-colors">
+                            <i class='bx bx-menu text-2xl'></i>
+                        </button>
+                       
+                    </div>
+
+                    <div id="header-search" class="hidden md:flex items-center gap-4 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 w-64 lg:w-96 transition-all">
+                        <i class='bx bx-search text-slate-400 text-xl'></i>
+                        <input type="text" placeholder="{{ __('Teklif veya Müşteri Ara...') }}" class="bg-transparent border-none outline-none text-sm font-medium w-full placeholder:text-slate-400">
+                        <span class="text-[10px] font-bold text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-100 hidden lg:inline">⌘K</span>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 lg:gap-3">
                     <!-- Language Switcher -->
                     <div x-data="{ open: false }" class="relative">
                         <button @click="open = !open" class="h-10 px-3 flex items-center gap-2 rounded-xl bg-white border border-slate-100 text-slate-500 hover:text-slate-950 hover:bg-slate-50 transition-all font-bold text-xs">
@@ -301,14 +332,14 @@
                         <i class='bx bx-bell text-xl'></i>
                         <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
                     </button>
-                    <a href="{{ route('proposals.create') }}" class="h-10 px-4 flex items-center gap-2 rounded-xl bg-slate-950 text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
-                        <i class='bx bx-plus text-xl'></i> {{ __('Yeni Teklif Oluştur') }}
+                    <a href="{{ route('proposals.create') }}" class="h-10 px-3 lg:px-4 flex items-center gap-2 rounded-xl bg-slate-950 text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
+                        <i class='bx bx-plus text-xl'></i> <span class="hidden sm:inline">{{ __('Yeni Teklif Oluştur') }}</span>
                     </a>
                 </div>
             </header>
 
             <!-- Page Content -->
-            <div class="p-8 max-w-[1500px] mx-auto">
+            <div class="p-4 lg:p-8 max-w-[1500px] mx-auto">
                 @yield('content')
             </div>
         </main>

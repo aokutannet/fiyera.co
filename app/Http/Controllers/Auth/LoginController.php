@@ -15,7 +15,17 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
+        $key = 'login|'.$request->ip();
+
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 4)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
+            return back()->withErrors([
+                'email' => 'Çok fazla giriş denemesi. Lütfen '.$seconds.' saniye sonra tekrar deneyiniz.',
+            ])->onlyInput('email');
+        }
+
         if (Auth::attempt($credentials)) {
+            \Illuminate\Support\Facades\RateLimiter::clear($key);
             $request->session()->regenerate();
 
             $user = Auth::user();
@@ -37,6 +47,8 @@ class LoginController extends Controller
 
             return redirect()->intended('dashboard');
         }
+
+        \Illuminate\Support\Facades\RateLimiter::hit($key);
 
         return back()->withErrors([
             'email' => 'Girdiğiniz bilgiler hatalı.',

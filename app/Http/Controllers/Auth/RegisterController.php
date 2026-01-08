@@ -23,6 +23,17 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
+        $key = 'register|'.$request->ip();
+
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
+            return back()->withErrors([
+                'email' => 'Çok fazla kayıt denemesi. Lütfen '.$seconds.' saniye sonra tekrar deneyiniz.',
+            ])->withInput();
+        }
+
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 3600);
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],

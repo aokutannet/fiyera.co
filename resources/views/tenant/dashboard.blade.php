@@ -228,7 +228,7 @@
     @endpush
 
     <!-- Business Overview Grid -->
-    <div id="stats-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div id="stats-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <!-- Total Customers -->
         <div class="bg-white p-6 rounded-md border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all group cursor-default relative overflow-hidden">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full group-hover:bg-emerald-100/50 transition-colors"></div>

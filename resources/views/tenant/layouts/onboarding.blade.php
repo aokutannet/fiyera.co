@@ -21,7 +21,14 @@
     <!-- Main Content -->
     <main class="min-h-screen flex flex-col w-full">
         <!-- Minimal Header -->
-       
+        <header class="h-24 flex items-center justify-center sticky top-0 z-50 bg-white/90 backdrop-blur-sm">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+                    <i class='bx bxs-bolt text-white text-xl'></i>
+                </div>
+                <span class="font-extrabold text-2xl tracking-tight text-black">fiyera<span class="text-slate-300">.co</span></span>
+            </div>
+        </header>
         
         <div class="flex-1 flex flex-col">
             @yield('content')
@@ -29,7 +36,7 @@
 
         <!-- Minimal Footer -->
         <footer class="py-8 text-center text-xs font-bold text-slate-300">
-            &copy; {{ date('Y') }} fiyero.co
+            &copy; {{ date('Y') }} fiyera.co
         </footer>
     </main>
 

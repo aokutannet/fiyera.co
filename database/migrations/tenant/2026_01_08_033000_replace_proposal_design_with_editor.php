@@ -221,7 +221,7 @@ return new class extends Migration
             <div class="flex flex-col gap-1 justify-center items-center">
                 <p class="text-xs text-gray-400 uppercase tracking-widest font-medium">Bu belge dijital olarak oluşturulmuştur</p>
                 <div class="w-8 h-px bg-gray-200 my-2"></div>
-                <p class="text-[10px] text-gray-300 font-semibold tracking-wide">Bu teklif fiyero.co sistemi tarafından hazırlanmıştır</p>
+                <p class="text-[10px] text-gray-300 font-semibold tracking-wide">Bu teklif fiyera.co sistemi tarafından hazırlanmıştır</p>
             </div>
         </div>
     </div>

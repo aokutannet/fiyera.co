@@ -30,6 +30,10 @@ class SettingController extends Controller
 
         foreach ($data as $key => $value) {
             if ($request->hasFile($key)) {
+                $request->validate([
+                    $key => ['image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+                ]);
+
                 $file = $request->file($key);
                 $tenantId = auth()->user()->tenant_id;
                 // Generate a unique name
