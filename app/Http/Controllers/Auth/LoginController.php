@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class LoginController extends Controller
+{
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            // Tenant bağlantısını ayarla (ActivityLog için gerekli)
+            if ($user->tenant_id) {
+                $dbName = "tenant_{$user->tenant_id}_teklif";
+                \Illuminate\Support\Facades\Config::set("database.connections.tenant.database", $dbName);
+                \Illuminate\Support\Facades\DB::purge('tenant');
+            }
+            if ($user->two_factor_enabled && !$user->google_id) {
+                 $user->generateTwoFactorCode();
+                 \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\TwoFactorCode($user->two_factor_code));
+                 return redirect()->intended('verify');
+            }
+
+            // Tenant status check is now handled by CheckSubscription middleware
+            // to allow redirection to account-inactive page instead of immediate logout.
+
+            return redirect()->intended('dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'Girdiğiniz bilgiler hatalı.',
+        ])->onlyInput('email');
+    }
+    
+    public function logout(Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
+    }
+}
