@@ -13,7 +13,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 
 class RegisterController extends Controller
 {
@@ -44,17 +43,6 @@ class RegisterController extends Controller
             'company_name' => ['required', 'string', 'max:255'],
             'privacy_consent' => ['required', 'accepted'],
             'marketing_consent' => ['nullable'],
-            'g-recaptcha-response' => ['required', function ($attribute, $value, $fail) {
-                $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-                    'secret' => env('RECAPTCHA_SECRET_KEY'),
-                    'response' => $value,
-                    'remoteip' => request()->ip(),
-                ]);
-        
-                if (! $response->json('success')) {
-                    $fail('Robot olmadığınızı doğrulayın.');
-                }
-            }],
         ]);
 
         try {

@@ -18,7 +18,6 @@
                 letter-spacing: -0.01em; 
             }
         </style>
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
     <body class="min-h-screen flex flex-col bg-[#fafafa]" x-data="{ modal: null }">
 
@@ -105,7 +104,7 @@
                             </div>
                         </div>
 
-                        <div class="g-recaptcha my-4" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                        </div>
 
                         <button type="submit" 
                             class="w-full bg-slate-950 text-white font-bold py-3.5 rounded-xl text-sm hover:bg-slate-800 transition-all duration-200 shadow-lg shadow-slate-900/20 active:scale-[0.98] flex items-center justify-center gap-2 mt-2">

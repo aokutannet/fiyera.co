@@ -18,7 +18,6 @@
                 letter-spacing: -0.01em; 
             }
         </style>
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
     <body class="min-h-screen flex flex-col bg-[#fafafa]">
 
@@ -68,7 +67,7 @@
                             <label for="remember" class="text-sm font-medium text-slate-600">{{ __('Beni Hatırla') }}</label>
                         </div>
 
-                        <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                        </div>
 
                         <button type="submit" 
                             class="w-full bg-slate-950 text-white font-bold py-3.5 rounded-xl text-sm hover:bg-slate-800 transition-all duration-200 shadow-lg shadow-slate-900/20 active:scale-[0.98] flex items-center justify-center gap-2">
@@ -109,7 +108,7 @@
             </div>
         </div>
         
-        <div class="w-full py-6 flex flex-col items-center gap-4 z-50 bg-[#fafafa] md:fixed md:bottom-0 md:left-0">
+              <div class="w-full py-6 flex flex-col items-center gap-4 z-50 bg-[#fafafa]">
              <!-- Language Switcher -->
              <div x-data="{ open: false }" class="relative">
                 <button @click="open = !open" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm hover:shadow text-xs font-bold text-slate-600 transition-all">
