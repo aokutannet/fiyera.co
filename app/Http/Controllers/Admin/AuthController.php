@@ -21,12 +21,8 @@ class AuthController extends Controller
         ]);
 
         if (Auth::guard('super_admin')->attempt($credentials, $request->remember)) {
-            $user = Auth::guard('super_admin')->user();
-            $this->generateTwoFactorCode($user);
-            
-            $request->session()->put('admin_auth_passed', true); // Tentative auth passed
-            
-            return redirect()->route('admin.verify.index');
+            $request->session()->regenerate();
+            return redirect()->route('admin.dashboard');
         }
 
         return back()->withErrors([
@@ -83,12 +79,5 @@ class AuthController extends Controller
         return redirect()->route('admin.login');
     }
 
-    protected function generateTwoFactorCode($user)
-    {
-        $user->two_factor_code = rand(100000, 999999);
-        $user->two_factor_expires_at = now()->addMinutes(10);
-        $user->save();
 
-        \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\TwoFactorCode($user->two_factor_code));
-    }
 }

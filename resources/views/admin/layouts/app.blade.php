@@ -133,6 +133,14 @@
                                 <i class='bx bx-receipt text-xl'></i>
                                 <span class="sidebar-item-text sidebar-transition truncate">Siparişler</span>
                             </a>
+                            <a id="nav-onboarding" href="{{ route('admin.onboarding.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.onboarding.*') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all duration-200">
+                                <i class='bx bxs-magic-wand text-xl'></i>
+                                <span class="sidebar-item-text sidebar-transition truncate">Onboarding Başvuruları</span>
+                            </a>
+                            <a id="nav-onboarding-questions" href="{{ route('admin.onboarding-questions.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.onboarding-questions.*') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all duration-200">
+                                <i class='bx bx-list-check text-xl'></i>
+                                <span class="sidebar-item-text sidebar-transition truncate">Soru Yönetimi</span>
+                            </a>
                         </nav>
                     </div>
                 </div>

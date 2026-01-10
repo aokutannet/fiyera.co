@@ -17,6 +17,7 @@
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-100">
                         <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kullanıcı</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Platform</th>
                         <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">İşlem Türü</th>
                         <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">İlgili Kayıt</th>
                         <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Açıklama</th>
@@ -37,6 +38,20 @@
                                         <p class="text-[10px] text-slate-400 font-medium font-mono">{{ $log->ip_address }}</p>
                                     </div>
                                 </div>
+                            </td>
+                            <td class="px-4 md:px-6 py-4 text-center">
+                                @php
+                                    $isMobile = isset($log->properties['source']) && $log->properties['source'] === 'mobile_api';
+                                @endphp
+                                @if($isMobile)
+                                    <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-50 text-purple-600 ring-4 ring-purple-50/50" title="Mobil Uygulama">
+                                        <i class='bx bx-mobile-alt text-lg'></i>
+                                    </div>
+                                @else
+                                    <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 text-slate-400 ring-4 ring-slate-50/50" title="Web Paneli">
+                                        <i class='bx bx-desktop text-lg'></i>
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-4 md:px-6 py-4">
                                 @php
@@ -88,7 +103,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="7" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
                                         <i class='bx bx-history text-3xl text-slate-300'></i>

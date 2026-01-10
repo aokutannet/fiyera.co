@@ -92,6 +92,7 @@
                             </span>
                         @endif
                         <span class="text-xs text-slate-400">@if($user->position) • {{ $user->position }} @endif</span>
+                        <span class="text-xs text-slate-400">• {{ $user->proposals_count }} Teklif Hazırladı</span>
                     </div>
                 </div>
                  <!-- Status Badge (Absolute Top Right) -->
@@ -138,6 +139,7 @@
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-100">
                         <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kullanıcı</th>
+                        <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Teklifler</th>
                         <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Rol</th>
                         <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Durum</th>
                         <th class="px-4 md:px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">E-posta</th>
@@ -155,6 +157,11 @@
                                     <p class="text-xs text-slate-400">@if($user->position) {{ $user->position }} @else Üye @endif</p>
                                 </div>
                             </div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600">
+                                {{ $user->proposals_count }} Adet
+                            </span>
                         </td>
                         <td class="px-4 md:px-6 py-4">
                             @if($user->is_owner)

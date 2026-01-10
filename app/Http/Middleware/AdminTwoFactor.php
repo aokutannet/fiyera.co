@@ -16,11 +16,7 @@ class AdminTwoFactor
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('super_admin')->check() && !session('admin_two_factor_verified')) {
-             if (!$request->is('superadmin/verify*') && !$request->is('superadmin/logout')) {
-                return redirect()->route('admin.verify.index');
-             }
-        }
+
 
         return $next($request);
     }

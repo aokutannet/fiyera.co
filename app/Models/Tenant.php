@@ -17,7 +17,8 @@ class Tenant extends Model
         'trial_starts_at',
         'trial_ends_at',
         'onboarding_completed',
-        'billing_details'
+        'billing_details',
+        'onboarding_data'
     ];
 
     protected $casts = [
@@ -25,6 +26,7 @@ class Tenant extends Model
         'trial_ends_at' => 'datetime',
         'onboarding_completed' => 'boolean',
         'billing_details' => 'array',
+        'onboarding_data' => 'array',
     ];
 
     protected static function booted()

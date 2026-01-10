@@ -38,7 +38,7 @@ class SettingController extends Controller
                 $tenantId = auth()->user()->tenant_id;
                 // Generate a unique name
                 $filename = $key . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs("tenants/{$tenantId}/uploads", $filename, 'public');
+                $path = $file->storeAs("tenants/{$tenantId}/uploads", $filename, 'uploads');
                 $value = $path;
             }
             

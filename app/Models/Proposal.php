@@ -32,7 +32,9 @@ class Proposal extends Model
         'total_amount',
         'currency',
         'status',
+        'source',
         'notes',
+        'public_token',
     ];
 
     protected $casts = [

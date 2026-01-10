@@ -2,240 +2,360 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $proposal->proposal_number }} - {{ $proposal->title }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+        /* Base Reset & Fonts */
+        * { box-sizing: border-box; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Inter', sans-serif; 
+            font-size: 11px;
+            color: #1f2937; 
+            line-height: 1.4;
+            background-color: white;
+        }
+
+        /* mPDF specific Layout */
+        @page {
+            margin: 15mm;
+        }
+        footer {
+            position: fixed; 
+            bottom: -40px; 
+            left: 0px; 
+            right: 0px;
+            height: 50px; 
+            text-align: center;
+            color: #9ca3af;
+            font-size: 9px;
+            line-height: 1.4;
+        }
+
+        /* Container - simplified for mPDF */
+        .page-container {
+            width: 100%;
+            padding: 0;
+            background: white;
+        }
+
+        /* Typography Helper Classes */
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: bold; }
+        .text-sm { font-size: 10px; }
+        .text-xs { font-size: 9px; }
+        .text-lg { font-size: 14px; }
+        .text-xl { font-size: 18px; font-weight: 800; }
+        .uppercase { text-transform: uppercase; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-indigo-600 { color: #4f46e5; }
+        .text-red-500 { color: #ef4444; }
+
+        /* Layout Tables */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        
+        td { vertical-align: top; }
+        
+        .section-mb { margin-bottom: 25px; }
+        .divider { border-bottom: 1px solid #e5e7eb; margin: 20px 0; }
+
+        /* Component Styles */
+        .logo-img { max-height: 60px; width: auto; }
+        
+        /* Clearfix */
+        .clearfix::after { content: ""; clear: both; display: table; }
+        
+        .avoid-break { page-break-inside: avoid; }
+        
+        /* Hide screen-only items */
+        .no-print { display: none; }
+
+        .info-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .info-value-lg {
+            font-size: 14px;
+            font-weight: 700;
             color: #111827;
+            margin: 0;
         }
-        @media print {
-            @page {
-                margin: 0;
-            }
-            body {
-                background-color: white !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .print-container {
-                box-shadow: none !important;
-                margin: 0 !important;
-                max-width: 100% !important;
-                width: 100% !important;
-                padding: 40px !important;
-                border: none !important;
-            }
+
+        .meta-box {
+            background-color: #f9fafb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 30px;
         }
+
+        .meta-table td { padding: 0 10px; border-right: 1px solid #e5e7eb; }
+        .meta-table td:last-child { border-right: none; }
+        .meta-table td:first-child { padding-left: 0; }
+
+        /* Items Table - Compact */
+        .items-table { margin-bottom: 30px; }
+        .items-table th {
+            text-align: left;
+            padding: 8px 10px;
+            background-color: #f9fafb;
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #6b7280;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        
+        .items-table td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+        }
+        .items-table tr:last-child td { border-bottom: none; }
+
+        /* Summary */
+        .summary-row td { padding: 5px 0; }
+        .summary-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; }
+        .summary-value { font-size: 12px; font-weight: 700; color: #111827; text-align: right; }
+        
+        .total-row td { padding-top: 20px; padding-bottom: 5px; }
+        .total-label { color: #4f46e5; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+        .total-sub { font-size: 10px; color: #9ca3af; font-weight: 600; text-transform: uppercase; }
+        .total-value { font-size: 20px; font-weight: 800; color: #111827; text-align: right; }
     </style>
-</head>
-<body class="antialiased min-h-screen">
     
-    <style>
-        :root {
-            --primary-color: {{ $primaryColor }};
-            --secondary-color: {{ $secondaryColor }};
-        }
-        .text-primary { color: var(--primary-color) !important; }
-        .bg-primary { background-color: var(--primary-color) !important; }
-        .text-secondary { color: var(--secondary-color) !important; }
-        .border-primary { border-color: var(--primary-color) !important; }
-    </style>
+    <!-- Action Bar Utils (Tailwind - Screen Only) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="{{ (isset($isPdf) && $isPdf) ? '' : 'antialiased min-h-screen' }}">
+    <!-- DomPDF Footer -->
+    @if(isset($isPdf) && $isPdf)
+    <footer>
+        Bu teklif {{ $proposal->user?->tenant?->name ?? config('app.name') }} tarafından oluşturulmuştur.
+    </footer>
+    @endif
+
     
     <!-- Action Bar (Screen Only) -->
+    @if(!isset($isPdf) || !$isPdf)
     <div class="max-w-[210mm] mx-auto mt-8 mb-6 flex justify-between items-center px-4 md:px-0 no-print">
         <a href="{{ route('proposals.show', $proposal) }}" class="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors font-medium text-sm">
-            <i class='bx bx-left-arrow-alt text-xl'></i>
-            <span>Geri Dön</span>
+            <span>&larr; Geri Dön</span>
         </a>
         <div class="flex gap-3">
             <button onclick="window.print()" class="h-10 px-4 rounded-lg bg-white border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
-                <i class='bx bx-printer'></i> Yazdır
+                Yazdır
             </button>
-            <button onclick="window.print()" class="h-10 px-4 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-all flex items-center gap-2 shadow-md">
-                <i class='bx bxs-file-pdf'></i> PDF İndir
-            </button>
+            <a href="{{ route('proposals.pdf', $proposal) }}" class="h-10 px-4 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-all flex items-center gap-2 shadow-md">
+                PDF İndir
+            </a>
         </div>
     </div>
+    @endif
 
     <!-- Document Container -->
-    <div class="max-w-[210mm] mx-auto bg-white shadow-lg print-container min-h-[297mm] relative flex flex-col">
+    <div class="{{ (isset($isPdf) && $isPdf) ? 'main-container' : 'max-w-[210mm] mx-auto bg-white shadow-lg print-container min-h-[297mm] relative flex flex-col p-12' }}">
         
-        @foreach($layout as $block)
-            @continue(isset($block['visible']) && !$block['visible'])
+        <!-- Header -->
+        <table class="w-full mb-16">
+            <tr>
+                <td class="align-top">
+                    @php
+                        $logoSettings = \App\Models\Setting::whereIn('key', ['proposal_logo', 'company_logo_png', 'company_logo_jpg'])->get()->keyBy('key');
+                        $logoPath = $logoSettings['proposal_logo']->value 
+                            ?? $logoSettings['company_logo_png']->value 
+                            ?? $logoSettings['company_logo_jpg']->value 
+                            ?? null;
+                    @endphp
 
-            @switch($block['id'])
-                
-                {{-- HEADER BLOCK --}}
-                @case('header')
-                    <div class="p-12 pb-8">
-                        <div class="flex justify-between items-start">
-                            <div class="w-1/2">
-                                @php
-                                    $logoSettings = \App\Models\Setting::whereIn('key', ['proposal_logo', 'company_logo_png', 'company_logo_jpg'])->get()->keyBy('key');
-                                    $logoPath = $logoSettings['proposal_logo']->value 
-                                        ?? $logoSettings['company_logo_png']->value 
-                                        ?? $logoSettings['company_logo_jpg']->value 
-                                        ?? null;
-                                @endphp
-
-                                @if($logoPath)
-                                    <img src="{{ asset('storage/'.$logoPath) }}" class="h-16 w-auto object-contain mb-6" alt="Logo">
-                                @else
-                                    <div class="text-2xl font-bold tracking-tight text-primary mb-6 flex items-center gap-2">
-                                         <div class="w-8 h-8 bg-primary text-white rounded flex items-center justify-center">
-                                            <span class="font-bold text-lg cursor-default select-none">{{ substr(config('app.name'), 0, 1) }}</span>
-                                         </div>
-                                         {{ config('app.name', 'fiyera.co') }}
-                                    </div>
-                                @endif
-
-                                <div class="text-sm text-secondary leading-relaxed">
-                                    <p class="font-semibold text-primary">{{ $proposal->user?->tenant?->name ?? (auth()->user()?->tenant?->name ?? config('app.name')) }}</p>
-                                    <p>{{ $proposal->user?->email ?? (auth()->user()?->email ?? '-') }}</p>
-                                </div>
-                            </div>
-
-                            <div class="w-1/2 text-right">
-                                <h1 class="text-3xl font-light text-primary tracking-tight mb-2">TEKLİF</h1>
-                                <p class="text-secondary font-medium text-sm mb-6">#{{ $proposal->proposal_number }}</p>
-                                
-                                <div class="space-y-1 text-sm">
-                                    <div class="flex justify-end gap-8">
-                                        <span class="text-secondary w-24">Tarih:</span>
-                                        <span class="text-primary font-medium">{{ $proposal->proposal_date->format('d.m.Y') }}</span>
-                                    </div>
-                                    <div class="flex justify-end gap-8">
-                                        <span class="text-secondary w-24">Geçerlilik:</span>
-                                        <span class="text-primary font-medium">{{ $proposal->valid_until ? $proposal->valid_until->format('d.m.Y') : 'Süresiz' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @break
-
-                {{-- SEPARATOR BLOCK --}}
-                @case('separator_1')
-                    <div class="px-12">
-                        <div class="w-full border-b border-gray-100 mb-8"></div>
-                    </div>
-                    @break
-
-                {{-- RECIPIENT BLOCK --}}
-                @case('recipient')
-                    <div class="px-12 mb-12">
-                        <h3 class="text-secondary text-xs font-semibold uppercase tracking-wider mb-2">SAYIN</h3>
-                        <div class="text-primary">
-                            <p class="text-xl font-semibold mb-1">{{ $proposal->customer->company_name }}</p>
-                            <div class="text-sm text-secondary space-y-0.5">
-                                @if($proposal->customer->contact_person)<p>{{ $proposal->customer->contact_person }}</p>@endif
-                                @if($proposal->customer->company_email)<p>{{ $proposal->customer->company_email }}</p>@endif
-                                @if($proposal->customer->mobile_phone)<p>{{ $proposal->customer->mobile_phone }}</p>@endif
-                                @if($proposal->customer->address)<p class="max-w-xs">{{ $proposal->customer->address }}</p>@endif
-                            </div>
-                        </div>
-                    </div>
-                    @break
-
-                {{-- ITEMS TABLE BLOCK --}}
-                @case('items')
-                    <div class="px-12 flex-grow">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="border-b-2 border-gray-100">
-                                    <th class="py-3 text-xs font-semibold text-secondary uppercase tracking-wider w-1/2">Hizmet / Ürün</th>
-                                    <th class="py-3 text-xs font-semibold text-secondary uppercase tracking-wider text-center">Miktar</th>
-                                    <th class="py-3 text-xs font-semibold text-secondary uppercase tracking-wider text-right">Birim Fiyat</th>
-                                    <th class="py-3 text-xs font-semibold text-secondary uppercase tracking-wider text-right">Toplam</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @foreach($proposal->items as $item)
-                                <tr>
-                                    <td class="py-4 pr-4 align-top">
-                                        <p class="text-primary font-medium text-sm">{{ $item->description }}</p>
-                                        @if($item->discount_amount > 0)
-                                            <span class="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded mt-1 inline-block">İndirimli</span>
-                                        @endif
-                                    </td>
-                                    <td class="py-4 text-center align-top text-gray-600 text-sm">{{ number_format($item->quantity, 0) }} {{ $item->unit }}</td>
-                                    <td class="py-4 text-right align-top text-gray-600 text-sm whitespace-nowrap">{{ number_format($item->unit_price, 2) }} {{ $proposal->currency }}</td>
-                                    <td class="py-4 text-right align-top text-primary font-medium text-sm whitespace-nowrap">{{ number_format($item->total_price, 2) }} {{ $proposal->currency }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @break
-
-                {{-- SUMMARY BLOCK --}}
-                @case('summary')
-                    <div class="px-12 mt-8 mb-12">
-                        <div class="flex justify-end">
-                            <div class="w-64 space-y-3">
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-secondary">Ara Toplam</span>
-                                    <span class="text-primary font-medium">{{ number_format($proposal->subtotal, 2) }} {{ $proposal->currency }}</span>
-                                </div>
-                                
-                                @if($proposal->discount_amount > 0)
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-green-600">İndirim</span>
-                                    <span class="text-green-600 font-medium">-{{ number_format($proposal->discount_amount, 2) }} {{ $proposal->currency }}</span>
-                                </div>
-                                @endif
-
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-secondary">KDV (Toplam)</span>
-                                    <span class="text-primary font-medium">{{ number_format($proposal->tax_amount, 2) }} {{ $proposal->currency }}</span>
-                                </div>
-
-                                <div class="border-t border-gray-200 pt-3 mt-3">
-                                    <div class="flex justify-between items-baseline">
-                                        <span class="text-primary font-semibold">Genel Toplam</span>
-                                        <span class="text-2xl font-bold text-primary tracking-tight">{{ number_format($proposal->total_amount, 2) }} {{ $proposal->currency }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @break
-
-                {{-- NOTES BLOCK --}}
-                @case('notes')
-                    @if($proposal->notes)
-                    <div class="px-12 mb-12">
-                        <div class="bg-gray-50 rounded-lg p-6 border border-gray-100">
-                            <h4 class="text-xs font-semibold text-secondary uppercase tracking-wider mb-2">Notlar</h4>
-                            <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ $proposal->notes }}</p>
-                        </div>
-                    </div>
+                    @if($logoPath)
+                        <img src="{{ isset($isPdf) && $isPdf ? public_path('uploads/'.$logoPath) : asset('uploads/'.$logoPath) }}" class="logo-img" alt="Logo">
+                    @else
+                        <h1 style="font-size: 24px; color: #111827;">{{ config('app.name', 'Fiyera') }}</h1>
                     @endif
-                    @break
-
-                {{-- FOOTER BLOCK --}}
-                @case('footer')
-                    <div class="mt-auto px-12 py-8 bg-gray-50 border-t border-gray-100 text-center print:bg-white print:border-t-0">
-                        <div class="flex flex-col gap-1 justify-center items-center">
-                            <p class="text-xs text-gray-400 uppercase tracking-widest font-medium">Bu belge dijital olarak oluşturulmuştur</p>
-                            <div class="w-8 h-px bg-gray-200 my-2"></div>
-                            <p class="text-[10px] text-gray-300 font-semibold tracking-wide">Bu teklif fiyera.co sistemi tarafından hazırlanmıştır</p>
-                        </div>
+                </td>
+                <td class="align-top text-right">
+                    <div class="text-3xl" style="color: #111827; letter-spacing: -0.5px; opacity: 0.4; font-weight: 700;">TEKLİFTİR</div>
+                    <div style="font-weight: 700; font-size: 14px; margin-top: 5px; color: #111827;">#{{ $proposal->proposal_number }}</div>
+                    <div style="color: #9ca3af; font-size: 10px; font-weight: 600; text-transform: uppercase;">
+                        {{ \Carbon\Carbon::parse($proposal->proposal_date)->format('d.m.Y') }}
                     </div>
-                    @break
+                </td>
+            </tr>
+        </table>
 
-            @endswitch
-        @endforeach
+        <div class="divider"></div>
+
+        <!-- Recipient Info -->
+        <table class="section-mb">
+            <tr>
+                <td style="width: 50%; padding-right: 20px;">
+                    <span class="info-label">DÜZENLEYEN</span>
+                    <div class="info-value-lg">{{ $proposal->user?->tenant?->name ?? (auth()->user()?->tenant?->name ?? config('app.name')) }}</div>
+                    <div style="color: #6b7280; font-size: 12px; margin-top: 4px;">{{ $proposal->user?->name }}</div>
+                    <div style="color: #6b7280; font-size: 12px;">{{ $proposal->user?->email }}</div>
+                </td>
+                <td style="width: 50%; padding-left: 20px;">
+                    <span class="info-label">SAYIN / FİRMA</span>
+                    <div class="info-value-lg">{{ $proposal->customer->company_name }}</div>
+                    <div style="color: #6b7280; font-size: 12px; margin-top: 4px;">{{ $proposal->customer->contact_person }}</div>
+                    <div style="color: #6b7280; font-size: 12px;">{{ $proposal->customer->company_email }}</div>
+                    @if($proposal->customer->address)
+                        <div style="color: #9ca3af; font-size: 11px; margin-top: 8px;">{{ $proposal->customer->address }}</div>
+                    @endif
+                </td>
+            </tr>
+        </table>
+
+        <!-- Meta Grid -->
+        <div class="meta-box">
+            <table class="meta-table">
+                <tr>
+                    <td style="width: 25%;">
+                        <span class="info-label">TEKLİF TARİHİ</span>
+                        <div style="font-weight: 700; color: #111827;">{{ \Carbon\Carbon::parse($proposal->proposal_date)->format('d.m.Y') }}</div>
+                    </td>
+                    <td style="width: 25%;">
+                        <span class="info-label">GEÇERLİLİK</span>
+                        <div style="font-weight: 700; color: #111827;">{{ $proposal->valid_until ? \Carbon\Carbon::parse($proposal->valid_until)->format('d.m.Y') : '-' }}</div>
+                    </td>
+                    <td style="width: 25%;">
+                        <span class="info-label">TESLİM TARİHİ</span>
+                        <div style="font-weight: 700; color: #111827;">{{ $proposal->delivery_date ? \Carbon\Carbon::parse($proposal->delivery_date)->format('d.m.Y') : '-' }}</div>
+                    </td>
+                    <td style="width: 25%;">
+                        <span class="info-label">ÖDEME</span>
+                        <div style="font-weight: 700; color: #111827;">{{ $proposal->payment_type ?? '-' }}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 45%;">HİZMET / ÜRÜN AÇIKLAMASI</th>
+                    <th style="width: 10%; text-align: center;">MİKTAR</th>
+                    <th style="width: 20%; text-align: right;">BİRİM FİYAT</th>
+                    <th style="width: 10%; text-align: center;">VERGİ</th>
+                    <th style="width: 15%; text-align: right;">TOPLAM</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($proposal->items as $item)
+                <tr>
+                    <td>
+                        <div style="font-weight: 700; font-size: 12px; color: #111827;">{{ $item->product_name ?? 'Hizmet' }}</div>
+                        <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">{{ $item->description }}</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <span style="font-weight: 700;">{{ number_format($item->quantity, 0) }}</span>
+                        <span style="font-size: 9px; color: #9ca3af; display: block;">{{ $item->unit }}</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <span style="font-weight: 700;">{{ number_format($item->unit_price, 2) }} {{ $proposal->currency }}</span>
+                        @if($item->discount_amount > 0)
+                            <div style="font-size: 9px; color: #ef4444; margin-top: 2px;">-{{ number_format($item->discount_amount, 2) }} İnd.</div>
+                        @endif
+                    </td>
+                    <td style="text-align: center; color: #9ca3af; font-size: 11px;">
+                        %{{ $item->tax_rate }}
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: #111827;">
+                        {{ number_format($item->total_price, 2) }} {{ $proposal->currency }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <!-- Summary & Notes (Grouped to avoid break) -->
+        <div class="avoid-break">
+            <table class="section-mb" style="margin-top: 40px;">
+                <tr>
+                    <!-- Notes (Left) -->
+                    <td style="width: 60%; padding-right: 40px; vertical-align: top;">
+                        @if($proposal->notes)
+                            <div>
+                                <span class="info-label">NOTLAR</span>
+                                <div style="background-color: #f9fafb; border-radius: 8px; padding: 15px; font-size: 11px; color: #4b5563; line-height: 1.6; margin-top: 5px;">
+                                    {!! nl2br(e($proposal->notes)) !!}
+                                </div>
+                            </div>
+                        @endif
+                    </td>
+
+                    <!-- Totals (Right) -->
+                    <td style="width: 40%; vertical-align: top;">
+                        <table style="width: 100%;">
+                            <tr class="summary-row">
+                                <td class="summary-label">ARA TOPLAM</td>
+                                <td class="summary-value">{{ number_format($proposal->subtotal, 2) }} {{ $proposal->currency }}</td>
+                            </tr>
+                            
+                            @if($proposal->discount_amount > 0)
+                            <tr class="summary-row">
+                                <td class="summary-label" style="color: #ef4444;">İNDİRİM</td>
+                                <td class="summary-value" style="color: #ef4444;">-{{ number_format($proposal->discount_amount, 2) }} {{ $proposal->currency }}</td>
+                            </tr>
+                            @endif
+
+                            <tr class="summary-row">
+                                <td class="summary-label">TOPLAM KDV</td>
+                                <td class="summary-value">{{ number_format($proposal->tax_amount, 2) }} {{ $proposal->currency }}</td>
+                            </tr>
+
+                            <tr class="summary-row">
+                                <td colspan="2">
+                                    <div style="border-bottom: 2px dashed #e5e7eb; margin: 15px 0;"></div>
+                                </td>
+                            </tr>
+
+                            <tr class="total-row">
+                                <td style="vertical-align: bottom;">
+                                    <div class="total-label">GENEL TOPLAM</div>
+                                    <div class="total-sub">KDV DAHİL</div>
+                                </td>
+                                <td style="vertical-align: bottom;">
+                                    <div class="total-value">{{ number_format($proposal->total_amount, 2) }} {{ $proposal->currency }}</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
     </div>
+
+   
+    <!-- DomPDF Page Counter Script -->
+    <script type="text/php">
+        if (isset($pdf)) {
+            $text = "Sayfa {PAGE_NUM} / {PAGE_COUNT}";
+            $size = 9;
+            $font = $fontMetrics->getFont("DejaVu Sans");
+            $width = $fontMetrics->get_text_width($text, $font, $size) / 2;
+            $x = ($pdf->get_width() - $width) / 2;
+            $y = $pdf->get_height() - 25;
+            $pdf->page_text($x, $y, $text, $font, $size, array(0.61, 0.64, 0.69));
+        }
+    </script>
 </body>
 </html>
+

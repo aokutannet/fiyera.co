@@ -120,7 +120,10 @@
                         <div class="w-9 h-9 bg-slate-950 rounded-xl flex items-center justify-center shadow-lg shadow-slate-200 flex-shrink-0">
                             <i class='bx bxs-bolt text-white text-xl'></i>
                         </div>
-                        <span class="font-extrabold text-xl tracking-tight text-slate-950 sidebar-brand-text sidebar-transition whitespace-nowrap">fiyera<span class="text-indigo-600">.co</span></span>
+                        <span class="font-extrabold text-xl tracking-tight text-slate-950 sidebar-brand-text sidebar-transition whitespace-nowrap inline-flex items-center">
+                            fiyera<span class="text-indigo-600">.co</span>
+                            <span class="ml-1.5 px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-400 text-[9px] font-semibold tracking-wider uppercase relative -top-px">Beta</span>
+                        </span>
                     </div>
                     <button id="sidebarToggle" class="hidden lg:flex sidebar-toggle-btn w-8 h-8 items-center justify-center rounded-lg hover:bg-slate-50 text-slate-400 hover:text-slate-950 transition-all">
                         <i class='bx bx-chevron-left text-xl' id="toggle-icon"></i>
@@ -143,15 +146,24 @@
                             </a>
                             <a id="nav-proposals" href="{{ route('proposals.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('proposals.*') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all duration-200">
                                 <i class='bx bx-file text-xl'></i>
-                                <span class="sidebar-item-text sidebar-transition truncate">{{ __('Teklifler') }}</span>
+                                <span class="sidebar-item-text sidebar-transition flex-1 flex items-center justify-between">
+                                    <span class="truncate">{{ __('Teklifler') }}</span>
+                                    <span class="bg-slate-50 text-slate-400 py-0.5 px-2 rounded-md text-[10px] font-bold border border-slate-100 group-hover:bg-white transition-colors">{{ \App\Models\Proposal::count() }}</span>
+                                </span>
                             </a>
                             <a id="nav-customers" href="{{ route('customers.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('customers.index') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all duration-200">
                                 <i class='bx bx-group text-xl'></i>
-                                <span class="sidebar-item-text sidebar-transition truncate">{{ __('Müşteriler') }}</span>
+                                <span class="sidebar-item-text sidebar-transition flex-1 flex items-center justify-between">
+                                    <span class="truncate">{{ __('Müşteriler') }}</span>
+                                    <span class="bg-slate-50 text-slate-400 py-0.5 px-2 rounded-md text-[10px] font-bold border border-slate-100 group-hover:bg-white transition-colors">{{ \App\Models\Customer::count() }}</span>
+                                </span>
                             </a>
                             <a id="nav-products" href="{{ route('products.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('products.*') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all duration-200">
                                 <i class='bx bx-category text-xl'></i>
-                                <span class="sidebar-item-text sidebar-transition truncate">{{ __('Ürün / Hizmetler') }}</span>
+                                <span class="sidebar-item-text sidebar-transition flex-1 flex items-center justify-between">
+                                    <span class="truncate">{{ __('Ürün / Hizmetler') }}</span>
+                                    <span class="bg-slate-50 text-slate-400 py-0.5 px-2 rounded-md text-[10px] font-bold border border-slate-100 group-hover:bg-white transition-colors">{{ \App\Models\Product::count() }}</span>
+                                </span>
                             </a>
                             <a id="nav-reports" href="{{ route('reports.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('reports.*') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all duration-200">
                                 <i class='bx bx-bar-chart-alt-2 text-xl'></i>
@@ -163,19 +175,15 @@
                     <div>
                         <p class="px-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 sidebar-section-label sidebar-transition">{{ __('Sistem') }}</p>
                         <nav class="space-y-1">
-                            <a href="{{ route('users.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 {{ request()->routeIs('users.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                            <svg class="mr-3 h-5 w-5 {{ request()->routeIs('users.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
-                            {{ __('Kullanıcılar') }}
-                        </a>
+                            <a id="nav-users" href="{{ route('users.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('users.*') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all duration-200">
+                                <i class='bx bx-user text-xl'></i>
+                                <span class="sidebar-item-text sidebar-transition truncate">{{ __('Kullanıcılar') }}</span>
+                            </a>
 
-                        <a href="{{ route('activity-logs.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 {{ request()->routeIs('activity-logs.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                            <svg class="mr-3 h-5 w-5 {{ request()->routeIs('activity-logs.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {{ __('İşlem Geçmişi') }}
-                        </a>    
+                            <a id="nav-activity" href="{{ route('activity-logs.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('activity-logs.*') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all duration-200">
+                                <i class='bx bx-history text-xl'></i>
+                                <span class="sidebar-item-text sidebar-transition truncate">{{ __('İşlem Geçmişi') }}</span>
+                            </a>
                             <a id="nav-settings" href="{{ route('settings.index') }}" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('settings.*') ? 'sidebar-link-active' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50' }} rounded-xl transition-all">
                                 <i class='bx bx-cog text-xl'></i>
                                 <span class="sidebar-item-text sidebar-transition truncate">{{ __('Sistem Ayarları') }}</span>

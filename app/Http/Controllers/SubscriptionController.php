@@ -33,28 +33,28 @@ class SubscriptionController extends Controller
         $usage = [
             'proposals' => [
                 'label' => __('Aylık Teklif'),
-                'used' => Proposal::count(),
+                'used' => Proposal::where('tenant_id', $tenant->id)->count(),
                 'limit' => $limits['proposal_monthly'] ?? 0,
                 'icon' => 'bx-file',
                 'color' => 'indigo'
             ],
             'customers' => [
                 'label' => __('Müşteri Sayısı'),
-                'used' => Customer::count(),
+                'used' => Customer::where('tenant_id', $tenant->id)->count(),
                 'limit' => $limits['customer_count'] ?? 0,
                 'icon' => 'bx-group',
                 'color' => 'emerald'
             ],
             'products' => [
                 'label' => __('Ürün / Hizmet'),
-                'used' => Product::count(),
+                'used' => Product::where('tenant_id', $tenant->id)->count(),
                 'limit' => $limits['product_count'] ?? 0,
                 'icon' => 'bx-cube',
                 'color' => 'sky'
             ],
             'users' => [
                 'label' => __('Kullanıcılar'),
-                'used' => User::count(),
+                'used' => User::where('tenant_id', $tenant->id)->count(),
                 'limit' => $limits['user_count'] ?? 0,
                 'icon' => 'bx-user',
                 'color' => 'amber'
@@ -164,11 +164,39 @@ class SubscriptionController extends Controller
             $currentSubscription = $tenant->activeSubscription;
 
             // Downgrade Protection
-            if ($currentSubscription && $currentSubscription->isActive() && now()->lt($currentSubscription->ends_at)) {
+            // Only apply downgrade restriction if ACTIVE (PAID) subscription exists
+            if ($currentSubscription && $currentSubscription->isActive() && $currentSubscription->payment_provider !== 'free' && now()->lt($currentSubscription->ends_at)) {
                 // Determine if it's a downgrade based on price (proxy for plan tier)
                 if ($newPlan->price_monthly < $currentSubscription->plan->price_monthly) {
                      return back()->withErrors(['error' => __('Mevcut paketinizin süresi dolmadan alt bir pakete geçiş yapamazsınız.')]);
                 }
+            }
+            
+            // Handle Free Plan Purchase (Edge case if "Buy Now" clicked for 0 price plan)
+            $basePrice = $request->billing_period === 'yearly' ? $newPlan->price_yearly : $newPlan->price_monthly;
+            
+            if ($basePrice == 0) {
+                 $tenant->update([
+                    'subscription_plan' => $newPlan->slug,
+                    'subscription_plan_id' => $newPlan->id,
+                    'subscription_status' => 'active',
+                    'trial_ends_at' => null,
+                    'onboarding_completed' => true,
+                    'status' => 'active',
+                ]);
+
+                 \App\Models\Subscription::create([
+                    'tenant_id' => $tenant->id,
+                    'plan_id' => $newPlan->id,
+                    'billing_period' => $request->billing_period,
+                    'price' => 0,
+                    'starts_at' => now(),
+                    'ends_at' => now()->addYears(100),
+                    'status' => 'active',
+                    'payment_provider' => 'free',
+                ]);
+
+                return redirect()->route('subscription.index')->with('success', __('Paketiniz başarıyla güncellendi!'));
             }
 
             // 1. Update Billing Information

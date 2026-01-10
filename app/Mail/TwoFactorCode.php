@@ -14,13 +14,15 @@ class TwoFactorCode extends Mailable
     use Queueable, SerializesModels;
 
     public $code;
+    public $isMobile;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($code)
+    public function __construct($code, $isMobile = false)
     {
         $this->code = $code;
+        $this->isMobile = $isMobile;
     }
 
     /**
@@ -29,7 +31,7 @@ class TwoFactorCode extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Giriş Doğrulama Kodunuz'
+            subject: $this->isMobile ? 'Mobil Uygulama Giriş Doğrulama Kodunuz' : 'Giriş Doğrulama Kodunuz'
         );
     }
 

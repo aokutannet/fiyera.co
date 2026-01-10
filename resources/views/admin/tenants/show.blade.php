@@ -252,6 +252,25 @@
             </div>
             @endif
 
+
+
+            <!-- Onboarding Details Card -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                 <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Onboarding (Wizard) Bilgileri</h3>
+                 @if(empty($tenant->onboarding_data))
+                    <p class="text-xs text-slate-400 italic">Henüz onboarding verisi bulunmuyor.</p>
+                 @else
+                     <div class="space-y-4">
+                        @foreach($tenant->onboarding_data as $data)
+                        <div class="border-b border-slate-50 last:border-0 pb-2 last:pb-0">
+                             <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">{{ $data['label'] ?? $data['key'] }}</span>
+                             <span class="text-xs font-bold text-slate-700 block whitespace-pre-wrap">{{ is_array($data['value']) ? implode(', ', $data['value']) : $data['value'] }}</span>
+                        </div>
+                        @endforeach
+                     </div>
+                 @endif
+            </div>
+
             <!-- Billing Details Card -->
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                  <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Fatura Bilgileri</h3>

@@ -36,11 +36,7 @@ class LoginController extends Controller
                 \Illuminate\Support\Facades\Config::set("database.connections.tenant.database", $dbName);
                 \Illuminate\Support\Facades\DB::purge('tenant');
             }
-            if ($user->two_factor_enabled && !$user->google_id) {
-                 $user->generateTwoFactorCode();
-                 \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\TwoFactorCode($user->two_factor_code));
-                 return redirect()->intended('verify');
-            }
+
 
             // Tenant status check is now handled by CheckSubscription middleware
             // to allow redirection to account-inactive page instead of immediate logout.

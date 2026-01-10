@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="https://unpkg.com/imask"></script>
 
-<div class="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500" 
+<div class="max-w-8xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500" 
      x-data="proposalForm()">
     
     <!-- Header -->
@@ -86,7 +86,7 @@
                 </div>
 
                 <!-- Teklif Kalemleri -->
-                <div class="bg-white rounded-3xl p-5 md:p-8 border border-slate-100 shadow-sm">
+                <div class="bg-white rounded-md p-5 md:p-8 border border-slate-100 shadow-sm">
                     <div class="flex items-center justify-between mb-8 border-b border-slate-50 pb-4">
 
                         <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Teklif Kalemleri</h3>
@@ -119,20 +119,28 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-span-6 md:col-span-3 lg:col-span-2">
+                                    <div class="col-span-6 md:col-span-3 lg:col-span-3">
                                         <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 px-1">Miktar</label>
-                                        <div class="flex items-center gap-1.5">
+                                        <div class="grid grid-cols-2 gap-2">
                                             <input type="number" step="0.01" :name="`items[${index}][quantity]`" x-model="item.quantity" required
-                                                class="w-16 h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all">
-                                            <select :name="`items[${index}][unit]`" x-model="item.unit" class="flex-1 h-10 px-2 rounded-xl bg-white border border-slate-200 text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all text-center appearance-none">
-                                                <option value="Adet">Adet</option>
-                                                <option value="Saat">Saat</option>
-                                                <option value="Ay">Ay</option>
-                                                <option value="Kg">Kg</option>
-                                                <option value="Gram">Gr</option>
-                                                <option value="Metre">Mt</option>
-                                                <option value="Paket">Pkt</option>
-                                            </select>
+                                                class="w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all text-center">
+                                            <div>
+                                                <select :name="`items[${index}][unit]`" x-model="item.unit" x-init="initUnitSelect($el, index)" class="w-full" style="display: none;">
+                                                    <option value="Adet">Adet</option>
+                                                    <option value="Saat">Saat</option>
+                                                    <option value="Ay">Ay</option>
+                                                    <option value="Gün">Gün</option>
+                                                    <option value="Yıl">Yıl</option>
+                                                    <option value="Çift">Çift</option>
+                                                    <option value="Kg">Kg</option>
+                                                    <option value="Gram">Gr</option>
+                                                    <option value="Metre">Mt</option>
+                                                    <option value="mt">mt</option>
+                                                    <option value="Paket">Pkt</option>
+                                                    <option value="Litre">Lt</option>
+                                                    <option value="m2">m2</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-span-6 md:col-span-3 lg:col-span-2">
@@ -147,7 +155,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-span-4 md:col-span-2 lg:col-span-2">
+                                    <div class="col-span-4 md:col-span-2 lg:col-span-1">
                                         <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 px-1">KDV%</label>
                                         <select :name="`items[${index}][tax_rate]`" x-model="item.tax_rate" required
                                             class="w-full h-10 px-2 rounded-xl bg-white border border-slate-200 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all appearance-none text-center">
@@ -231,26 +239,30 @@
                             class="w-full h-12 px-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all">
                     </div>
 
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Geçerlilik Tarihi</label>
-                        <input type="date" name="valid_until" value="{{ old('valid_until') }}"
-                            class="w-full h-12 px-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all">
-                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Geçerlilik Tarihi</label>
+                            <input type="date" name="valid_until" value="{{ old('valid_until') }}"
+                                class="w-full h-12 px-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all">
+                        </div>
 
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Teslim Tarihi</label>
-                        <input type="date" name="delivery_date" value="{{ old('delivery_date') }}"
-                            class="w-full h-12 px-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Teslim Tarihi</label>
+                            <input type="date" name="delivery_date" value="{{ old('delivery_date') }}"
+                                class="w-full h-12 px-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all">
+                        </div>
                     </div>
 
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Ödeme Türü</label>
-                        <select name="payment_type" class="w-full h-12 px-5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-600 transition-all appearance-none">
-                            <option value="Peşin">Peşin</option>
-                            <option value="30 Gün Vadeli">30 Gün Vadeli</option>
-                            <option value="60 Gün Vadeli">60 Gün Vadeli</option>
-                            <option value="Kredi Kartı">Kredi Kartı</option>
-                        </select>
+                        <div class="payment-type-wrapper">
+                            <select name="payment_type" x-init="initPaymentSelect($el)" class="w-full">
+                                <option value="">Seçiniz...</option>
+                                <option value="Nakit">Nakit</option>
+                                <option value="Havale/EFT">Havale/EFT</option>
+                                <option value="Kredi Kartı">Kredi Kartı</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -315,7 +327,7 @@
                             TASLAK KAYDET
                         </button>
                         <button type="button" @click="submitAs('pending')" class="py-4 rounded-2xl bg-indigo-600 text-white text-xs font-black hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-900/40">
-                            YAYINLA
+                            TEKLİF OLUŞTUR
                         </button>
                     </div>
                 </div>
@@ -428,6 +440,31 @@ function proposalForm() {
             });
         },
 
+        initUnitSelect(el, index) {
+            new TomSelect(el, {
+                create: true,
+                sortField: {field: 'text', direction: 'asc'},
+                placeholder: 'Birim',
+                maxOptions: 50,
+                plugins: ['no_backspace_delete'],
+                onItemAdd: function(){
+                    this.setTextboxValue('');
+                    this.refreshOptions();
+                },
+                render: {
+                    option: function(data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    },
+                    item: function(data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    }
+                },
+                onChange: (value) => {
+                    this.items[index].unit = value;
+                }
+            });
+        },
+
         calculateLineDiscount(item) {
             const qty = parseFloat(item.quantity) || 0;
             const price = parseFloat(item.unit_price) || 0;
@@ -485,7 +522,8 @@ function proposalForm() {
                        const option = ts.options[value];
                        
                        // Check if it's a real product from backend (has price property)
-                       if (option && option.price !== undefined) {
+                       // distinct check for 'undefined' to allow 0 price
+                       if (option && option.price !== undefined && option.price !== null) {
                            // Existing Product Selected
                            this.items[index].product_id = option.id;
                            this.items[index].description = option.name;
@@ -500,15 +538,38 @@ function proposalForm() {
                            }
                            
                        } else {
-                           // New Product (Created) - Text only
+                           // New Product (Created) or text fallback
                            this.items[index].product_id = null;
-                           this.items[index].description = value;
-                           // Do NOT reset price/tax/unit here, let user keep/enter logic
+                           
+                           // Use option name/text if available, otherwise value
+                           // This prevents ID from being used as description if option lookup fails partially
+                           this.items[index].description = option ? (option.name || option.text || value) : value;
                        }
                     } else {
                         // Cleared
                         this.items[index].product_id = null;
                         this.items[index].description = '';
+                    }
+                }
+            });
+        },
+
+        initPaymentSelect(el) {
+            new TomSelect(el, {
+                create: true,
+                sortField: {field: 'text', direction: 'asc'},
+                placeholder: 'Ödeme Türü Seçin veya Yazın...',
+                maxOptions: 50,
+                plugins: ['no_backspace_delete'],
+                render: {
+                    option: function(data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    },
+                    item: function(data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    },
+                    option_create: function(data, escape) {
+                        return '<div class="create"><b>' + escape(data.input) + '</b> Ekle...</div>';
                     }
                 }
             });
@@ -621,43 +682,74 @@ function proposalForm() {
 </script>
 
 <style>
-/* Tom Select Customization to match theme */
+/* Tom Select Customization */
+.ts-wrapper {
+    width: 100% !important;
+    min-width: 0 !important; /* Fix flex child constraints */
+}
 .ts-control {
-    border: 1px solid #f1f5f9 !important;
-    background-color: #f8fafc !important;
-    padding: 10px 20px !important;
-    border-radius: 16px !important;
-    font-size: 14px !important;
+    border: 1px solid #e2e8f0 !important;
+    background-color: #ffffff !important;
+    padding: 0 12px !important;
+    padding-right: 24px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important; /* Match adjacent text-xs */
     font-weight: 700 !important;
-    color: #0f172a !important;
+    color: #334155 !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
     box-shadow: none !important;
+}
+
+/* Specific Style for Payment Type (Big Select) */
+.payment-type-wrapper .ts-control {
+    min-height: 48px !important; /* h-12 */
+    height: 48px !important;
+    background-color: #f8fafc !important; /* bg-slate-50 */
+    border-radius: 1rem !important; /* rounded-2xl */
+    font-size: 14px !important; /* text-sm */
+}
+.ts-control .item {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #334155 !important;
+    vertical-align: middle !important;
 }
 .ts-wrapper.focus .ts-control {
     border-color: #4f46e5 !important;
-    ring: 4px rgba(79, 70, 229, 0.05) !important;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.05) !important;
 }
 .ts-dropdown {
-    border-radius: 20px !important;
-    border: 1px solid #f1f5f9 !important;
-    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1) !important;
-    padding: 10px !important;
+    border-radius: 16px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    padding: 6px !important;
+    font-size: 12px !important;
+    z-index: 50 !important;
+    margin-top: 8px !important;
+}
+.ts-dropdown .option {
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    color: #64748b !important; 
 }
 .ts-dropdown .option.active {
     background-color: #f5f3ff !important;
     color: #4f46e5 !important;
-    border-radius: 12px !important;
 }
-.ts-dropdown .no-results {
-    padding: 10px 20px;
-    color: #94a3b8;
-    font-size: 12px;
-    font-weight: 600;
+/* Fix Input Input Group Alignment */
+.ts-wrapper.single .ts-control:after {
+    display: none !important; /* We will use background image if needed or just clean look */
 }
-.ts-dropdown .create {
-    padding: 10px 20px;
-    color: #4f46e5;
-    font-size: 13px;
-    font-weight: 700;
+/* Custom Arrow */
+.ts-control {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: right 0.5rem center !important;
+    background-size: 1.5em 1.5em !important;
+    background-repeat: no-repeat !important;
 }
 </style>
 @endsection

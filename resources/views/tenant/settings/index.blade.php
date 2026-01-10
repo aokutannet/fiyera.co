@@ -29,14 +29,13 @@
             <!-- Mobile Dropdown -->
             <div class="lg:hidden relative mb-4">
                 <select x-model="activeTab" class="w-full h-14 pl-5 pr-10 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-600/20 shadow-sm transition-all">
-                    @foreach(['general', 'logo', 'proposal', 'proposal_design', 'email', 'sms', 'danger'] as $group)
+                    @foreach(['general', 'logo', 'proposal', 'email', 'sms', 'danger'] as $group)
                         @php
                             if($group !== 'danger' && !$groupedSettings->has($group)) continue; 
                             $groupLabels = [
                                 'general' => 'Genel Ayarlar',
                                 'logo' => 'Logo Ayarları',
                                 'proposal' => 'Teklif Ayarları',
-                                'proposal_design' => 'Teklif Tasarımı',
                                 'email' => 'E-posta Ayarları',
                                 'sms' => 'SMS Ayarları',
                                 'danger' => 'Verilerimi ve Hesabımı Sil',
@@ -52,7 +51,7 @@
 
             <!-- Desktop Sidebar -->
             <div class="hidden lg:block space-y-2">
-            @foreach(['general', 'logo', 'proposal', 'proposal_design', 'email', 'sms', 'danger'] as $group)
+            @foreach(['general', 'logo', 'proposal', 'email', 'sms', 'danger'] as $group)
                 @php
                     if($group !== 'danger' && !$groupedSettings->has($group)) continue; 
 
@@ -60,7 +59,6 @@
                         'general' => 'Genel Ayarlar',
                         'logo' => 'Logo Ayarları',
                         'proposal' => 'Teklif Ayarları',
-                        'proposal_design' => 'Teklif Tasarımı',
                         'email' => 'E-posta Ayarları',
                         'sms' => 'SMS Ayarları',
                         'danger' => 'Verilerimi ve Hesabımı Sil',
@@ -70,7 +68,6 @@
                         'general' => 'bx-slider-alt',
                         'logo' => 'bx-image',
                         'proposal' => 'bx-file-blank',
-                        'proposal_design' => 'bx-palette',
                         'email' => 'bx-envelope',
                         'sms' => 'bx-message-rounded-dots',
                         'danger' => 'bx-error-circle',
@@ -192,156 +189,12 @@
 
                                 </div>
                             
-                            @elseif($group === 'proposal_design')
-                                {{-- SortableJS & Preview Logic --}}
-                                <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
-                                <div class="w-full"
-                                     x-data="{
-                                        layout: {{ $settings->where('key', 'proposal_layout')->first()?->value ?? '[]' }},
-                                        primaryColor: '{{ $settings->where('key', 'proposal_color_primary')->first()?->value ?? '#111827' }}',
-                                        secondaryColor: '{{ $settings->where('key', 'proposal_color_secondary')->first()?->value ?? '#6B7280' }}',
-                                        previewUrl: '{{ route('proposals.design-preview') }}',
-                                        isProcessing: false,
-                                        
-                                        initSortable() {
-                                            if (this.layout.length === 0) return;
-                                            this.$nextTick(() => {
-                                                new Sortable(this.$refs.sortableList, {
-                                                    animation: 150,
-                                                    handle: '.drag-handle',
-                                                    ghostClass: 'bg-indigo-50',
-                                                    onEnd: (evt) => {
-                                                        const item = this.layout[evt.oldIndex];
-                                                        this.layout.splice(evt.oldIndex, 1);
-                                                        this.layout.splice(evt.newIndex, 0, item);
-                                                        this.updatePreview();
-                                                    }
-                                                });
-                                            });
-                                            this.updatePreview();
-                                        },
-                                        
-                                        updatePreview() {
-                                            if(this.isProcessing) return;
-                                            this.isProcessing = true; // Simple debounce state
-                                            
-                                            // Construct URL with params
-                                            const params = new URLSearchParams({
-                                                layout: JSON.stringify(this.layout),
-                                                primary_color: this.primaryColor,
-                                                secondary_color: this.secondaryColor
-                                            });
-                                            
-                                            this.previewUrl = '{{ route('proposals.design-preview') }}?' + params.toString();
-                                            
-                                            setTimeout(() => { this.isProcessing = false; }, 500);
-                                        }
-                                     }"
-                                     x-init="initSortable()"
-                                     x-effect="updatePreview()" 
-                                >
-                                    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-                                        
-                                        {{-- LEFT: Controls --}}
-                                        <div class="xl:col-span-4 space-y-8">
-                                            
-                                            {{-- Color Settings --}}
-                                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Renk Ayarları</h3>
-                                                <div class="space-y-4">
-                                                    <div>
-                                                        <label class="text-[10px] font-bold text-slate-700 mb-1 block">ANA RENK</label>
-                                                        <div class="flex gap-3 items-center">
-                                                            <input type="color" x-model="primaryColor" @input.debounce.300ms="updatePreview" class="h-10 w-12 rounded cursor-pointer border-0 p-0 shadow-sm">
-                                                            <input type="text" x-model="primaryColor" @input.debounce.300ms="updatePreview" class="flex-1 h-10 px-3 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 uppercase font-mono">
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label class="text-[10px] font-bold text-slate-700 mb-1 block">İKİNCİL RENK</label>
-                                                        <div class="flex gap-3 items-center">
-                                                            <input type="color" x-model="secondaryColor" @input.debounce.300ms="updatePreview" class="h-10 w-12 rounded cursor-pointer border-0 p-0 shadow-sm">
-                                                            <input type="text" x-model="secondaryColor" @input.debounce.300ms="updatePreview" class="flex-1 h-10 px-3 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 uppercase font-mono">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {{-- Layout Builder --}}
-                                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Bölüm Düzeni</h3>
-                                                
-                                                <div x-ref="sortableList" class="space-y-2">
-                                                    <template x-for="(item, index) in layout" :key="item.id">
-                                                        <div class="group bg-slate-50 border border-transparent hover:border-indigo-300 hover:bg-white rounded-lg p-3 flex items-center gap-3 transition-all relative select-none">
-                                                            
-                                                            {{-- Handle --}}
-                                                            <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-indigo-600">
-                                                                <i class='bx bx-grid-vertical text-lg'></i>
-                                                            </div>
-
-                                                            {{-- Title --}}
-                                                            <div class="flex-1">
-                                                                <span class="text-xs font-bold text-slate-700 block" x-text="item.title"></span>
-                                                            </div>
-
-                                                            {{-- Visibility Toggle --}}
-                                                            <div class="relative inline-block w-8 h-4 transition duration-200 ease-in-out rounded-full cursor-pointer"
-                                                                 @click="item.visible = !item.visible; updatePreview()">
-                                                                <div class="block w-full h-full rounded-full transition-colors duration-200"
-                                                                     :class="item.visible ? 'bg-indigo-600' : 'bg-slate-300'"></div>
-                                                                <div class="absolute left-0.5 top-0.5 bg-white w-3 h-3 rounded-full transition-transform duration-200 shadow-sm"
-                                                                     :class="item.visible ? 'translate-x-4' : 'translate-x-0'"></div>
-                                                            </div>
-
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                                <p class="text-[10px] text-slate-400 mt-3 px-1 text-center">Bölümleri sürükleyerek sırasını değiştirebilirsiniz.</p>
-                                            </div>
-
-                                            {{-- Save Info --}}
-                                            <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex items-start gap-3">
-                                                <i class='bx bx-info-circle text-indigo-500 text-xl mt-0.5'></i>
-                                                <p class="text-xs text-indigo-800 leading-relaxed font-medium">Bu ekranda yaptığınız değişiklikler önizleme amaçlıdır. Kalıcı olması için sayfanın altındaki <strong>Kaydet</strong> butonuna basmayı unutmayın.</p>
-                                            </div>
-
-                                        </div>
-
-                                        {{-- RIGHT: Live Preview --}}
-                                        <div class="xl:col-span-8 sticky top-6">
-                                            <div class="bg-slate-800 rounded-2xl p-4 shadow-2xl border border-slate-700">
-                                                <div class="flex items-center justify-between mb-4 px-2">
-                                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                                                        <i class='bx bx-show'></i> Canlı Önizleme
-                                                    </span>
-                                                    <div class="flex gap-2">
-                                                        <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
-                                                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
-                                                        <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="relative w-full bg-white rounded overflow-hidden" style="aspect-ratio: 210/297;">
-                                                    <iframe :src="previewUrl" class="w-full h-full border-0 transform origin-top left-0 top-0" style="position:absolute;"></iframe>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    
-                                    {{-- Hidden Inputs to Submit JSON --}}
-                                    <input type="hidden" name="proposal_layout" :value="JSON.stringify(layout)">
-                                    <input type="hidden" name="proposal_color_primary" :value="primaryColor">
-                                    <input type="hidden" name="proposal_color_secondary" :value="secondaryColor">
-                                </div>
-
                             @elseif($group === 'logo')
                                 {{-- Minimal Logo Layout with Delete --}}
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                                     @foreach($settings as $setting)
                                         <div class="col-span-1" x-data="{ 
-                                            imageUrl: '{{ $setting->value ? asset('storage/'.$setting->value) : '' }}',
+                                            imageUrl: '{{ $setting->value ? asset('uploads/'.$setting->value) : '' }}',
                                             hasImage: {{ $setting->value ? 'true' : 'false' }},
                                             removeFile() {
                                                 if(!confirm('Bu logoyu kaldırmak istediğinize emin misiniz?')) return;

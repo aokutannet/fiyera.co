@@ -9,7 +9,7 @@ class CustomerController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Customer::latest();
+        $query = Customer::withCount('proposals')->latest();
 
         if ($request->filled('search')) {
             $searchTerm = trim($request->search);
@@ -99,6 +99,27 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('success', 'Müşteri bilgileri güncellendi.');
     }
 
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:tenant.customers,id'
+        ]);
+
+        $count = 0;
+        foreach ($request->ids as $id) {
+            $customer = Customer::find($id);
+            if ($customer) {
+                // Check if customer has proposals, invocies etc before deleting if needed.
+                // For now, straight delete or soft delete if model supports it.
+                $customer->delete();
+                $count++;
+            }
+        }
+
+        return redirect()->route('customers.index')->with('success', "{$count} adet müşteri başarıyla silindi.");
+    }
+    
     public function destroy(Customer $customer)
     {
         $customer->delete();

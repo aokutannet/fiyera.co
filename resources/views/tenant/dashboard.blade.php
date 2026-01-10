@@ -228,6 +228,30 @@
 
     <!-- Business Overview Grid -->
     <div id="stats-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <!-- Monthly Revenue -->
+        <div class="bg-indigo-600 p-6 rounded-md shadow-xl shadow-indigo-600/20 group cursor-default relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-28 h-28 bg-white/10 rounded-full blur-2xl"></div>
+            <p class="text-[10px] font-black text-white/60 uppercase tracking-widest relative z-10">{{ __('Onaylanan Teklifler') }}</p>
+            
+            @if($monthlyVolume > 0)
+                <div class="flex items-end justify-between mt-4 relative z-10">
+                    <h3 class="text-3xl font-black text-white">₺{{ number_format($monthlyVolume, 2) }}</h3>
+                    <div class="flex items-center gap-1 text-[11px] font-bold text-white bg-white/20 px-2.5 py-1 rounded-xl backdrop-blur-md">
+                        <i class='bx bx-wallet'></i> {{ __('Bu Ay') }}
+                    </div>
+                </div>
+            @else
+                <!-- Empty State -->
+                <div class="flex items-end justify-between mt-4 relative z-10">
+                   <div class="flex flex-col">
+                        <span class="text-2xl font-black text-white/40">₺0.00</span>
+                   </div>
+                   <div class="flex items-center gap-1 text-[11px] font-bold text-white/60 bg-white/10 px-2.5 py-1 rounded-xl backdrop-blur-sm">
+                        <i class='bx bx-wallet'></i> {{ __('Hedefleniyor') }}
+                    </div>
+                </div>
+            @endif
+        </div>
         <!-- Total Customers -->
         <div class="bg-white p-6 rounded-md border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all group cursor-default relative overflow-hidden">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full group-hover:bg-emerald-100/50 transition-colors"></div>
@@ -303,30 +327,7 @@
             @endif
         </div>
 
-        <!-- Monthly Revenue -->
-        <div class="bg-indigo-600 p-6 rounded-md shadow-xl shadow-indigo-600/20 group cursor-default relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 w-28 h-28 bg-white/10 rounded-full blur-2xl"></div>
-            <p class="text-[10px] font-black text-white/60 uppercase tracking-widest relative z-10">{{ __('Aylık Ciro') }}</p>
-            
-            @if($monthlyVolume > 0)
-                <div class="flex items-end justify-between mt-4 relative z-10">
-                    <h3 class="text-3xl font-black text-white">₺{{ number_format($monthlyVolume, 2) }}</h3>
-                    <div class="flex items-center gap-1 text-[11px] font-bold text-white bg-white/20 px-2.5 py-1 rounded-xl backdrop-blur-md">
-                        <i class='bx bx-wallet'></i> {{ __('Bu Ay') }}
-                    </div>
-                </div>
-            @else
-                <!-- Empty State -->
-                <div class="flex items-end justify-between mt-4 relative z-10">
-                   <div class="flex flex-col">
-                        <span class="text-2xl font-black text-white/40">₺0.00</span>
-                   </div>
-                   <div class="flex items-center gap-1 text-[11px] font-bold text-white/60 bg-white/10 px-2.5 py-1 rounded-xl backdrop-blur-sm">
-                        <i class='bx bx-wallet'></i> {{ __('Hedefleniyor') }}
-                    </div>
-                </div>
-            @endif
-        </div>
+        
     </div>
 
     <!-- Main Content Area -->
@@ -379,8 +380,15 @@
                             <tr class="hover:bg-slate-50/50 transition-all group cursor-pointer" onclick="window.location='{{ route('proposals.show', $proposal) }}'">
                                 <td class="px-4 md:px-8 py-5">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-                                            <i class='bx bx-file text-xl text-slate-400 group-hover:text-indigo-600'></i>
+                                        <div class="relative">
+                                            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
+                                                <i class='bx bx-file text-xl text-slate-400 group-hover:text-indigo-600'></i>
+                                            </div>
+                                            @if($proposal->source === 'mobile_api')
+                                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-indigo-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm" title="Mobil Uygulama">
+                                                    <i class='bx bx-mobile text-white text-[10px]'></i>
+                                                </div>
+                                            @endif
                                         </div>
                                         <div>
                                             <div class="flex items-center gap-2">

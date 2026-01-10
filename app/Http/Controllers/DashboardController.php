@@ -37,7 +37,7 @@ class DashboardController extends Controller
         
         $recentProposals = Proposal::with('customer')
             ->latest()
-            ->take(5)
+            ->take(6)
             ->get();
 
         $revenueExpectation = Proposal::where('status', 'pending')->sum('total_amount');

@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Onboarding - {{ config('app.name', 'fiyera.co') }}</title>
+    <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,7 +37,7 @@
 
         <!-- Minimal Footer -->
         <footer class="py-8 text-center text-xs font-bold text-slate-300">
-            &copy; {{ date('Y') }} fiyera.co
+            &copy; {{ date('Y') }} powered by <a href="https://fiyera.co" target="_blank" class="text-indigo-600 hover:text-slate-600 transition-colors">fiyera.co</a>
         </footer>
     </main>
 

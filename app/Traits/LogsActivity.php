@@ -37,16 +37,20 @@ trait LogsActivity
         // Filter out hidden attributes if necessary, or sensitive data
         // For now, we log everything as this is an explicit requirement.
 
-        ActivityLog::create([
-            'user_id' => Auth::id(),
-            'subject_type' => get_class($this),
-            'subject_id' => $this->id,
-            'event' => $event,
-            'description' => $this->getActivityDescription($event),
-            'properties' => $properties,
-            'ip_address' => Request::ip(),
-            'user_agent' => Request::header('User-Agent'),
-        ]);
+        try {
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'subject_type' => get_class($this),
+                'subject_id' => $this->id,
+                'event' => $event,
+                'description' => $this->getActivityDescription($event),
+                'properties' => $properties,
+                'ip_address' => Request::ip(),
+                'user_agent' => Request::header('User-Agent'),
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to log activity: " . $e->getMessage());
+        }
     }
 
     protected function getActivityDescription($event)

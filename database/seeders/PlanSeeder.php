@@ -63,7 +63,7 @@ class PlanSeeder extends Seeder
                     'vat_calculation',
                     'email_sending',
                 ],
-                'is_popular' => true,
+                'is_popular' => false,
                 'description' => 'Küçük ekipler',
             ],
             [
@@ -123,7 +123,7 @@ class PlanSeeder extends Seeder
                     'logo_signature',
                     'validity_period',
                 ],
-                'is_popular' => false,
+                'is_popular' => true,
                 'description' => 'Kurumsal & ileri seviye kullanıcılar',
             ],
         ];

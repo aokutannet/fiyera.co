@@ -22,8 +22,16 @@ class OnboardingController extends Controller
         $hasCompletedWizard = DB::connection('tenant')->table('settings')
             ->where('key', 'onboarding_sector')
             ->exists();
+            
+        // Check if company details are filled
+        $hasCompanyDetails = DB::connection('tenant')->table('settings')
+            ->where('key', 'company_name')
+            ->exists();
 
         if ($hasCompletedWizard) {
+            if (!$hasCompanyDetails) {
+                 return redirect()->route('onboarding.company-details');
+            }
             return redirect()->route('onboarding.plans');
         }
 
@@ -36,8 +44,8 @@ class OnboardingController extends Controller
             'sector' => 'required',
             'team_size' => 'required',
             'monthly_proposals' => 'required',
-            'target_audience' => 'required',
-            'currency' => 'required',
+            // 'target_audience' => 'required', // Can be null/empty array
+            // 'currency' => 'required',
             'vat_usage' => 'required',
             'proposal_criteria' => 'required',
             'proposal_preparer' => 'required',
@@ -73,6 +81,75 @@ class OnboardingController extends Controller
             );
         }
 
+        // Save to Tenant Table for Super Admin visibility
+        $tenant->update([
+            'onboarding_data' => $answers
+        ]);
+
+        return redirect()->route('onboarding.company-details');
+    }
+
+    public function companyDetails()
+    {
+         return view('tenant.onboarding.company_details');
+    }
+
+    public function storeCompanyDetails(Request $request)
+    {
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'tax_title' => 'nullable|string|max:255',
+            'company_address' => 'nullable|string',
+            'country' => 'nullable|string',
+            'province' => 'nullable|string',
+            'district' => 'nullable|string',
+            'company_phone' => 'nullable|string',
+            'company_email' => 'nullable|email',
+            'tax_office' => 'nullable|string',
+            'tax_number' => 'nullable|string',
+        ]);
+
+        $tenant = auth()->user()->tenant;
+
+        // Update Tenant Table main info
+        $tenant->update([
+            'name' => $request->company_name,
+            'phone' => $request->company_phone ?? $tenant->phone,
+            'email' => $request->company_email ?? $tenant->email, 
+        ]);
+
+        // Map settings to be saved in tenant settings table
+        $settingsMap = [
+            'company_name' => ['Firma Adı', 'general', 'text', 'Firmanızın ticari adı'],
+            'tax_title' => ['Vergi Ünvanı', 'general', 'text', 'Resmi fatura ünvanı'],
+            'company_address' => ['Adres', 'general', 'textarea', 'Firma adresi'],
+            'country' => ['Ülke', 'general', 'text', ''],
+            'province' => ['Şehir', 'general', 'text', ''],
+            'district' => ['İlçe', 'general', 'text', ''],
+            'company_phone' => ['Telefon', 'general', 'text', 'İletişim numarası'],
+            'company_email' => ['E-posta', 'general', 'email', 'İletişim e-postası'],
+            'tax_office' => ['Vergi Dairesi', 'general', 'text', ''],
+            'tax_number' => ['Vergi Numarası', 'general', 'text', ''],
+        ];
+
+        foreach ($settingsMap as $key => $meta) {
+            $value = $request->input($key);
+            if ($value) {
+                DB::connection('tenant')->table('settings')->updateOrInsert(
+                    ['key' => $key],
+                    [
+                        'value' => $value,
+                        'label' => $meta[0],
+                        'group' => $meta[1],
+                        'type' => $meta[2],
+                        'description' => $meta[3],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
+                );
+            }
+        }
+
         return redirect()->route('onboarding.plans');
     }
 
@@ -90,20 +167,19 @@ class OnboardingController extends Controller
         if (request()->has('plan')) {
             $selectedPlan = $plans->where('id', request('plan'))->first();
             
-            // Prepare Billing Details for Autofill (Prioritize Settings as Source of Truth)
-            // User Request: "/settings buradaki genel ayalardan gelecek"
+            // Prepare Billing Details from Settings
             $settings = DB::connection('tenant')->table('settings')
                 ->whereIn('key', ['company_name', 'tax_office', 'tax_number', 'company_address', 'province', 'district', 'country'])
                 ->pluck('value', 'key');
             
             $billingDetails = [
-                 'company_name' => $settings['company_name'] ?? $tenant->billing_details['company_name'] ?? '',
-                 'tax_office' => $settings['tax_office'] ?? $tenant->billing_details['tax_office'] ?? '',
-                 'tax_number' => $settings['tax_number'] ?? $tenant->billing_details['tax_number'] ?? '',
-                 'address' => $settings['company_address'] ?? $tenant->billing_details['address'] ?? '',
-                 'city' => $settings['province'] ?? $tenant->billing_details['city'] ?? '',
-                 'district' => $settings['district'] ?? $tenant->billing_details['district'] ?? '',
-                 'country' => $settings['country'] ?? $tenant->billing_details['country'] ?? 'TR',
+                 'company_name' => $settings['company_name'] ?? '',
+                 'tax_office' => $settings['tax_office'] ?? '',
+                 'tax_number' => $settings['tax_number'] ?? '',
+                 'address' => $settings['company_address'] ?? '',
+                 'city' => $settings['province'] ?? '',
+                 'district' => $settings['district'] ?? '',
+                 'country' => $settings['country'] ?? 'TR',
              ];
         } else {
              $billingDetails = [];
@@ -128,20 +204,54 @@ class OnboardingController extends Controller
         $tenant = auth()->user()->tenant;
         $plan = \App\Models\Plan::where('slug', $request->plan)->firstOrFail();
         
-        // Set 14-day trial period
-        $trialEndsAt = now()->addDays(14);
+        // Check if plan is free
+        $price = $request->billing_cycle === 'monthly' ? $plan->price_monthly : $plan->price_yearly;
 
-        // Update tenant with trial details
-        // We use tenant table columns for trial management as requested
-        $tenant->update([
-            'subscription_plan' => $plan->slug,
-            'subscription_plan_id' => $plan->id,
-            'subscription_status' => 'trial',
-            'trial_starts_at' => now(),
-            'trial_ends_at' => $trialEndsAt,
-            'onboarding_completed' => true,
-            'status' => 'active', 
-        ]);
+        if ($price == 0) {
+            // Immediately activate free plan
+            $tenant->update([
+                'subscription_plan' => $plan->slug,
+                'subscription_plan_id' => $plan->id,
+                'subscription_status' => 'active',
+                'trial_ends_at' => null, // No trial needed for free plan
+                'onboarding_completed' => true,
+                'status' => 'active', 
+            ]);
+
+             // Create a zero-cost subscription record for consistency
+             \App\Models\Subscription::create([
+                'tenant_id' => $tenant->id,
+                'plan_id' => $plan->id,
+                'billing_period' => $request->billing_cycle,
+                'price' => 0,
+                'starts_at' => now(),
+                'ends_at' => now()->addYears(100), // Indefinite
+                'status' => 'active',
+                'payment_provider' => 'free',
+            ]);
+        } else {
+             // Paid Plan Logic
+             // If already on trial, just switch plan but keep original date
+             if ($tenant->onTrial()) {
+                 $tenant->update([
+                     'subscription_plan' => $plan->slug,
+                     'subscription_plan_id' => $plan->id,
+                     // Do NOT update trial_starts_at or trial_ends_at
+                 ]);
+             } else {
+                 // New Trial
+                 $trialEndsAt = now()->addDays(14);
+                 $tenant->update([
+                    'subscription_plan' => $plan->slug,
+                    'subscription_plan_id' => $plan->id,
+                    'subscription_status' => 'trial',
+                    'trial_starts_at' => now(),
+                    'trial_ends_at' => $trialEndsAt,
+                    'onboarding_completed' => true,
+                    'status' => 'active', 
+                ]);
+             }
+        }
 
         // Also reactivate the user if they were passive
         if (auth()->user()->status === 'passive') {
@@ -154,10 +264,6 @@ class OnboardingController extends Controller
         } catch (\Exception $e) {
             // Mail gönderimi başarısız olsa bile akışı bozma
             \Illuminate\Support\Facades\Log::error('Welcome email sending failed: ' . $e->getMessage());
-        }
-
-        if ($request->has('from_subscription_page')) {
-            return redirect()->route('subscription.index')->with('plan_upgraded', true);
         }
 
         if ($request->has('from_subscription_page')) {

@@ -27,11 +27,7 @@ class TwoFactorMiddleware
             }
 
             // 2. Check if 2FA is enabled (login flow)
-            if ($user->two_factor_enabled) {
-                if (!session('two_factor_verified')) {
-                    $needsVerification = true;
-                }
-            }
+
 
             if ($needsVerification) {
                 if (!$request->is('verify*') && !$request->is('logout')) {

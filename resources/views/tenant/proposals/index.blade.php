@@ -18,9 +18,36 @@
 <div class="space-y-8" x-data="{ 
     deleteProposal: null,
     isLimitModalOpen: false,
+    selected: [],
+    showStatusMenu: false,
+    pendingBulkAction: null,
+    pendingBulkStatus: null,
+    get allSelected() {
+        return this.selected.length === {{ $proposals->count() }} && this.selected.length > 0;
+    },
     confirmDelete(proposal) {
         this.deleteProposal = proposal;
         $dispatch('open-modal', 'delete-proposal-confirm');
+    },
+    toggleAll() {
+        if (this.allSelected) {
+            this.selected = [];
+        } else {
+            this.selected = {{ $proposals->pluck('id') }};
+        }
+    },
+    submitBulkAction(action, status = null) {
+        this.pendingBulkAction = action;
+        this.pendingBulkStatus = status;
+        $dispatch('open-modal', 'bulk-action-confirm');
+    },
+    confirmBulkAction() {
+        const form = document.getElementById('bulkActionForm');
+        document.getElementById('bulkActionInput').value = this.pendingBulkAction;
+        if (this.pendingBulkStatus) {
+            document.getElementById('bulkStatusInput').value = this.pendingBulkStatus;
+        }
+        form.submit();
     }
 }">
     <!-- Header -->
@@ -55,6 +82,106 @@
                 </a>
                 @endif
             @endif
+        </div>
+    </div>
+
+    @if($errors->any())
+    <div class="bg-rose-50 border border-rose-100 text-rose-700 px-4 py-3 rounded-xl text-sm font-medium">
+        <ul class="list-disc list-inside">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3">
+        <i class='bx bx-check-circle text-lg'></i>
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="bg-rose-50 border border-rose-100 text-rose-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3">
+        <i class='bx bx-error-circle text-lg'></i>
+        {{ session('error') }}
+    </div>
+    @endif
+
+    <!-- Bulk Actions (Floating) -->
+    <div x-show="selected.length > 0" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-full"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-full"
+         class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-full max-w-5xl px-4"
+         style="display: none;">
+        
+        <div class="bg-indigo-50/90 backdrop-blur-xl border border-indigo-100 rounded-full p-2 shadow-2xl shadow-indigo-900/10 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 pl-4">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-200/50 text-indigo-700 font-black text-sm">
+                    <span x-text="selected.length"></span>
+                </div>
+                <span class="text-sm font-bold text-slate-700 hidden sm:inline">Seçildi</span>
+            </div>
+            
+
+
+             <!-- The Form Structure Re-imagined for Alpine control -->
+             <div class="flex items-center gap-2 pr-2">
+                <button @click="selected = []" class="h-10 px-4 rounded-full text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-white/50 transition-all flex items-center justify-center leading-none">
+                    VAZGEÇ
+                </button>
+
+                <!-- Hidden Form for submission -->
+                <!-- Hidden Form for submission -->
+                <form id="bulkActionForm" action="{{ route('proposals.bulk-actions') }}" method="POST" class="hidden">
+                    @csrf
+                    <input type="hidden" name="action" id="bulkActionInput">
+                    <input type="hidden" name="status" id="bulkStatusInput">
+                    <!-- Send IDs as JSON string to avoid Alpine x-for rendering issues in hidden elements -->
+                    <input type="hidden" name="ids" :value="JSON.stringify(selected)">
+                </form>
+
+                <!-- Mail -->
+                <button @click="submitBulkAction('email')" class="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-all" title="Tekrar Mail Gönder">
+                    <i class='bx bx-envelope text-lg'></i>
+                </button>
+
+                <!-- SMS -->
+                <button @click="submitBulkAction('sms')" class="h-10 w-10 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-all" title="Tekrar SMS Gönder">
+                    <i class='bx bx-message-square-dots text-lg'></i>
+                </button>
+ 
+                <!-- Status Dropdown -->
+                <div class="relative" @click.away="showStatusMenu = false">
+                    <button @click="showStatusMenu = !showStatusMenu" class="h-10 px-4 rounded-full bg-white border border-indigo-100 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-all flex items-center gap-2 leading-none">
+                        <span>DURUM</span>
+                        <i class='bx bx-chevron-down text-lg'></i>
+                    </button>
+                    <!-- Menu -->
+                    <div x-show="showStatusMenu" class="absolute bottom-full left-0 mb-2 w-40 bg-white rounded-xl shadow-xl border border-indigo-50 overflow-hidden py-1" style="display: none;">
+                        <button @click="submitBulkAction('status', 'draft')" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600">Taslak</button>
+                        <button @click="submitBulkAction('status', 'pending')" class="w-full text-left px-4 py-2 text-xs font-bold text-amber-600 hover:bg-amber-50">Onay Bekliyor</button>
+                        <button @click="submitBulkAction('status', 'approved')" class="w-full text-left px-4 py-2 text-xs font-bold text-emerald-600 hover:bg-emerald-50">Onaylandı</button>
+                        <button @click="submitBulkAction('status', 'rejected')" class="w-full text-left px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50">Reddedildi</button>
+                    </div>
+                </div>
+
+                <!-- Set to Draft -->
+                <button @click="submitBulkAction('status', 'draft')" class="h-10 px-4 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all flex items-center gap-2 leading-none">
+                    <i class='bx bx-edit'></i> TASLAĞA AT
+                </button>
+
+                <!-- Delete -->
+                <button @click="submitBulkAction('delete')" class="h-10 px-4 rounded-full bg-rose-600 text-white text-xs font-black hover:bg-rose-700 transition-all shadow-lg shadow-rose-200 hover:shadow-rose-300 active:scale-95 flex items-center justify-center gap-2 leading-none">
+                    <i class='bx bx-trash text-base'></i>
+                    <span>SİL</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -93,7 +220,14 @@
                             <i class='bx bx-file text-xl'></i>
                         </div>
                         <div class="min-w-0">
-                            <p class="text-sm font-extrabold text-slate-950 truncate">{{ $proposal->proposal_number }}</p>
+                            <p class="text-sm font-extrabold text-slate-950 truncate flex items-center gap-1">
+                                {{ $proposal->proposal_number }}
+                                @if($proposal->source === 'mobile')
+                                    <i class='bx bx-mobile-alt text-indigo-500 text-base' title="Mobil Uygulama ile Oluşturuldu"></i>
+                                @else
+                                    <i class='bx bx-laptop text-slate-400 text-base' title="Web Paneli ile Oluşturuldu"></i>
+                                @endif
+                            </p>
                             <p class="text-xs text-slate-500 font-bold truncate">{{ $proposal->title }}</p>
                         </div>
                     </div>
@@ -160,6 +294,9 @@
         <table class="w-full text-left">
             <thead>
                 <tr class="bg-slate-50/50 border-b border-slate-100">
+                    <th class="pl-6 py-4 w-4">
+                        <input type="checkbox" @click="toggleAll()" :checked="allSelected" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-0 w-4 h-4 cursor-pointer">
+                    </th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Teklif Bilgisi</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Müşteri</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Tarih / Geçerlilik</th>
@@ -170,15 +307,25 @@
             </thead>
             <tbody class="divide-y divide-slate-50">
                 @foreach($proposals as $proposal)
-                <tr class="hover:bg-slate-50/50 transition-colors">
+                <tr class="hover:bg-slate-50/50 transition-colors" :class="{'bg-indigo-50/50 hover:bg-indigo-50/80': selected.includes({{ $proposal->id }})}">
+                    <td class="pl-6 py-4">
+                        <input type="checkbox" value="{{ $proposal->id }}" x-model="selected" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-0 w-4 h-4 cursor-pointer">
+                    </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
                                 <i class='bx bx-file text-xl'></i>
                             </div>
                             <div>
-                                <p class="text-sm font-bold text-slate-950">{{ $proposal->proposal_number }}</p>
-                                <p class="text-xs text-slate-500 font-medium">{{ $proposal->title }}</p>
+                                <p class="text-sm font-bold text-slate-950 flex items-center gap-1">
+                                    {{ $proposal->title }}
+                                    @if($proposal->source === 'mobile')
+                                        <i class='bx bx-mobile-alt text-indigo-500 text-base' title="Mobil Uygulama ile Oluşturuldu"></i>
+                                    @else
+                                        <i class='bx bx-laptop text-slate-400 text-base' title="Web Paneli ile Oluşturuldu"></i>
+                                    @endif
+                                </p>
+                                <p class="text-xs text-slate-500 font-medium">{{ $proposal->proposal_number }}</p>
                                 <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1 font-medium">
                                     <i class='bx bx-pencil text-[11px] text-slate-300'></i>
                                     <span class="opacity-70 text-[9px] uppercase tracking-tighter">HAZIRLAYAN:</span>
@@ -218,6 +365,14 @@
                              <a href="{{ route('proposals.show', $proposal) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100" data-tooltip="Görüntüle">
                                 <i class='bx bx-show text-lg'></i>
                             </a>
+                            @if(auth()->user()->hasPermission('proposals.create'))
+                            <form action="{{ route('proposals.duplicate', $proposal) }}" method="POST" class="inline-block">
+                                @csrf
+                                <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100" data-tooltip="Kopyasını Oluştur">
+                                    <i class='bx bx-copy text-lg'></i>
+                                </button>
+                            </form>
+                            @endif
                             <button type="button" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100" data-tooltip="E-Posta Gönder">
                                 <i class='bx bx-envelope text-lg'></i>
                             </button>
@@ -237,7 +392,7 @@
                 @endforeach
                 @if($proposals->isEmpty())
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center">
+                    <td colspan="7" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center gap-3">
                             <i class='bx bx-file text-4xl text-slate-200'></i>
                             <p class="text-slate-400 text-sm font-medium">Henüz teklif bulunamadı.</p>
@@ -328,6 +483,38 @@
                             EVET, SİL
                         </button>
                     </form>
+                    <button @click="open = false" class="w-full py-4 rounded-2xl bg-slate-50 text-slate-500 text-sm font-bold hover:bg-slate-100 transition-all">
+                        VAZGEÇ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </template>
+
+    <!-- Bulk Action Confirmation Modal -->
+    <template x-teleport="body">
+    <div x-data="{ open: false }" 
+         x-show="open" 
+         @open-modal.window="if($event.detail === 'bulk-action-confirm') open = true"
+         @close-modal.window="open = false"
+         class="fixed inset-0 z-[100] overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="open = false"></div>
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 overflow-hidden border border-slate-100 p-8 flex flex-col items-center">
+                <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center animate-pulse">
+                        <i class='bx bx-check-double text-4xl text-indigo-600'></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-black text-slate-950 mb-2">Emin misiniz?</h3>
+                <p class="text-slate-500 font-bold text-center leading-relaxed mb-8">
+                    Seçili teklifler için bu işlemi gerçekleştirmek istediğinize emin misiniz?
+                </p>
+                <div class="flex flex-col w-full gap-3">
+                    <button @click="confirmBulkAction(); open = false;" class="w-full py-4 rounded-2xl bg-indigo-600 text-white text-sm font-black hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-[0.98]">
+                        EVET, İŞLEMİ UYGULA
+                    </button>
                     <button @click="open = false" class="w-full py-4 rounded-2xl bg-slate-50 text-slate-500 text-sm font-bold hover:bg-slate-100 transition-all">
                         VAZGEÇ
                     </button>

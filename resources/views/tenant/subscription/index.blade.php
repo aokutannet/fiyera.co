@@ -40,9 +40,17 @@
                              @if($remainingTrialDays > 0)
                                 Deneme süresi bitiş: <span class="text-slate-900 font-bold">{{ $trialEndDate->format('d.m.Y') }}</span>
                             @else
-                                Yenilenme: <span class="text-slate-900 font-bold">
-                                    {{ $tenant->trial_ends_at ? $tenant->trial_ends_at->format('d.m.Y') : '-' }}
-                                </span>
+                                @if($activeSubscription)
+                                    @if($activeSubscription->price == 0)
+                                        Yenilenme: <span class="text-slate-900 font-bold">Süresiz</span>
+                                    @else
+                                        Yenilenme: <span class="text-slate-900 font-bold">{{ $activeSubscription->ends_at ? $activeSubscription->ends_at->format('d.m.Y') : '-' }}</span>
+                                    @endif
+                                @else
+                                    Yenilenme: <span class="text-slate-900 font-bold">
+                                        {{ $tenant->trial_ends_at ? $tenant->trial_ends_at->format('d.m.Y') : '-' }}
+                                    </span>
+                                @endif
                             @endif
                         </div>
                     </div>

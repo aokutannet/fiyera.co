@@ -20,7 +20,8 @@ Route::get('locale/{lang}', function ($lang) {
 // Uses default 'fiyera.co' if APP_DOMAIN is not set in .env
 Route::domain(env('APP_DOMAIN', 'fiyera.co'))->group(function () {
     Route::get('/', function () {
-        return view('frontend.index');
+        $plans = \App\Models\Plan::all();
+        return view('frontend.index', compact('plans'));
     })->name('landing');
 });
 
@@ -34,8 +35,8 @@ Route::domain('app.' . env('APP_DOMAIN', 'fiyera.co'))->group(function () {
 
     // Auth Routes
     Route::prefix('superadmin')->name('admin.')->group(function () {
-        Route::get('/login', [App\Http\Controllers\Admin\AuthController::class, 'showLoginForm'])->name('login');
-        Route::post('/login', [App\Http\Controllers\Admin\AuthController::class, 'login']);
+        Route::get('/login', [App\Http\Controllers\Admin\AuthController::class, 'showLoginForm'])->name('login')->middleware('guest:super_admin');
+        Route::post('/login', [App\Http\Controllers\Admin\AuthController::class, 'login'])->middleware('guest:super_admin');
         Route::post('/logout', [App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
 
         Route::middleware('auth:super_admin')->group(function () {
@@ -54,14 +55,16 @@ Route::domain('app.' . env('APP_DOMAIN', 'fiyera.co'))->group(function () {
                 Route::post('/tenants/{tenant}/impersonate', [App\Http\Controllers\Admin\TenantController::class, 'impersonate'])->name('tenants.impersonate');
                 Route::resource('orders', App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show']);
                 Route::post('/orders/{order}/upload-invoice', [App\Http\Controllers\Admin\OrderController::class, 'uploadInvoice'])->name('orders.upload-invoice');
+                Route::get('/onboarding', [App\Http\Controllers\Admin\OnboardingController::class, 'index'])->name('onboarding.index');
+                Route::resource('onboarding-questions', App\Http\Controllers\Admin\OnboardingQuestionController::class);
             });
         });
     });
 
     Route::get('/login', function () { 
         return view('tenant.login');
-    })->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
+    })->name('login')->middleware('guest');
+    Route::post('/login', [LoginController::class, 'login'])->middleware('guest');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -83,6 +86,8 @@ Route::domain('app.' . env('APP_DOMAIN', 'fiyera.co'))->group(function () {
         // Onboarding Routes
         Route::get('/onboarding', [App\Http\Controllers\OnboardingController::class, 'index'])->name('onboarding.index');
         Route::post('/onboarding', [App\Http\Controllers\OnboardingController::class, 'store'])->name('onboarding.store');
+        Route::get('/onboarding/company-details', [App\Http\Controllers\OnboardingController::class, 'companyDetails'])->name('onboarding.company-details');
+        Route::post('/onboarding/company-details', [App\Http\Controllers\OnboardingController::class, 'storeCompanyDetails'])->name('onboarding.company-details.store');
         Route::get('/onboarding/plans', [App\Http\Controllers\OnboardingController::class, 'plans'])->name('onboarding.plans');
         Route::get('/onboarding/processing', [App\Http\Controllers\OnboardingController::class, 'processing'])->name('onboarding.processing');
         Route::post('/onboarding/subscribe', [App\Http\Controllers\OnboardingController::class, 'subscribe'])->name('onboarding.subscribe');
@@ -131,13 +136,20 @@ Route::domain('app.' . env('APP_DOMAIN', 'fiyera.co'))->group(function () {
                     Route::put('/customers/{customer}', [\App\Http\Controllers\CustomerController::class, 'update'])->name('customers.update');
                     Route::patch('/customers/{customer}/toggle-status', [\App\Http\Controllers\CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
                 });
-                Route::middleware(['permission:customers.delete'])->delete('/customers/{customer}', [\App\Http\Controllers\CustomerController::class, 'destroy'])->name('customers.destroy');
+                Route::middleware(['permission:customers.delete'])->group(function () {
+                    Route::delete('/customers/bulk-delete', [\App\Http\Controllers\CustomerController::class, 'bulkDestroy'])->name('customers.bulk-destroy');
+                    Route::delete('/customers/{customer}', [\App\Http\Controllers\CustomerController::class, 'destroy'])->name('customers.destroy');
+                });
             });
         
             // Product Management
             Route::middleware(['permission:products.view'])->group(function () {
                 Route::get('/products/search', [\App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
                 Route::get('/products', [\App\Http\Controllers\ProductController::class, 'index'])->name('products.index');
+                Route::get('/products/export', [\App\Http\Controllers\ProductController::class, 'export'])->name('products.export');
+                Route::post('/products/import/analyze', [\App\Http\Controllers\ProductController::class, 'analyzeImport'])->name('products.import.analyze');
+                Route::post('/products/import/map', [\App\Http\Controllers\ProductController::class, 'mapImport'])->name('products.import.map');
+                Route::post('/products/import/execute', [\App\Http\Controllers\ProductController::class, 'executeImport'])->name('products.import.execute');
                 Route::middleware(['permission:products.create'])->group(function () {
                     Route::get('/products/create', [\App\Http\Controllers\ProductController::class, 'create'])->name('products.create');
                     Route::post('/products', [\App\Http\Controllers\ProductController::class, 'store'])->name('products.store');
@@ -148,7 +160,10 @@ Route::domain('app.' . env('APP_DOMAIN', 'fiyera.co'))->group(function () {
                     Route::put('/products/{product}', [\App\Http\Controllers\ProductController::class, 'update'])->name('products.update');
                     Route::patch('/products/{product}/toggle-status', [\App\Http\Controllers\ProductController::class, 'toggleStatus'])->name('products.toggle-status');
                 });
-                Route::middleware(['permission:products.delete'])->delete('/products/{product}', [\App\Http\Controllers\ProductController::class, 'destroy'])->name('products.destroy');
+                Route::middleware(['permission:products.delete'])->group(function () {
+                    Route::delete('/products/bulk-delete', [\App\Http\Controllers\ProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
+                    Route::delete('/products/{product}', [\App\Http\Controllers\ProductController::class, 'destroy'])->name('products.destroy');
+                });
             });
         
             // Category Management
@@ -166,8 +181,10 @@ Route::domain('app.' . env('APP_DOMAIN', 'fiyera.co'))->group(function () {
                     Route::post('/proposals/{proposal}/send-email', [\App\Http\Controllers\ProposalController::class, 'sendEmail'])->name('proposals.send-email');
                     Route::post('/proposals/{proposal}/send-whatsapp', [\App\Http\Controllers\ProposalController::class, 'sendWhatsapp'])->name('proposals.send-whatsapp');
                 });
+                Route::get('/proposals/design-preview', [\App\Http\Controllers\ProposalController::class, 'designPreview'])->name('proposals.design-preview');
                 Route::get('/proposals/{proposal}', [\App\Http\Controllers\ProposalController::class, 'show'])->name('proposals.show');
                 Route::get('/proposals/{proposal}/print', [\App\Http\Controllers\ProposalController::class, 'print'])->name('proposals.print');
+                Route::get('/proposals/{proposal}/pdf', [\App\Http\Controllers\ProposalController::class, 'pdf'])->name('proposals.pdf');
                 
                 Route::middleware(['permission:proposals.edit'])->group(function () {
                     Route::get('/proposals/{proposal}/edit', [\App\Http\Controllers\ProposalController::class, 'edit'])->name('proposals.edit');
@@ -177,6 +194,18 @@ Route::domain('app.' . env('APP_DOMAIN', 'fiyera.co'))->group(function () {
                 });
     
                 Route::middleware(['permission:proposals.delete'])->delete('/proposals/{proposal}', [\App\Http\Controllers\ProposalController::class, 'destroy'])->name('proposals.destroy');
+                // Bulk Actions
+                Route::post('/proposals/bulk-actions', [\App\Http\Controllers\ProposalController::class, 'bulkActions'])->name('proposals.bulk-actions');
+                Route::post('/proposals/{proposal}/duplicate', [\App\Http\Controllers\ProposalController::class, 'duplicate'])->name('proposals.duplicate');
+                Route::post('/proposals/{proposal}/toggle-public', [\App\Http\Controllers\ProposalController::class, 'togglePublic'])->name('proposals.toggle-public');
+            });
+
+    // Public Proposal Routes (No Auth Required)
+            Route::withoutMiddleware([\App\Http\Middleware\SetTenant::class, 'auth'])->group(function() {
+                 Route::get('/offer/{token}', [\App\Http\Controllers\ProposalController::class, 'publicShow'])->name('proposals.public.show');
+                 Route::get('/offer/{token}/print', [\App\Http\Controllers\ProposalController::class, 'publicPrint'])->name('proposals.public.print');
+                 Route::get('/offer/{token}/pdf', [\App\Http\Controllers\ProposalController::class, 'publicPdf'])->name('proposals.public.pdf');
+                 Route::post('/offer/{token}/action', [\App\Http\Controllers\ProposalController::class, 'publicAction'])->name('proposals.public.action');
             });
         
             // System Settings
@@ -192,6 +221,5 @@ Route::domain('app.' . env('APP_DOMAIN', 'fiyera.co'))->group(function () {
             Route::resource('activity-logs', App\Http\Controllers\ActivityLogController::class)->only(['index', 'show']);
         });
     });
-    // This route was outside middleware but should be part of the app domain
-    Route::get('proposals/design-preview', [App\Http\Controllers\ProposalController::class, 'designPreview'])->name('proposals.design-preview');
+
 });

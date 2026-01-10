@@ -15,6 +15,7 @@ class ProposalActivity extends Model
         'description',
         'old_value',
         'new_value',
+        'ip_address'
     ];
 
     public function proposal()

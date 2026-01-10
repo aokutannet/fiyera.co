@@ -27,8 +27,8 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('plan_id')->constrained()->cascadeOnDelete();
             $table->enum('billing_period', ['monthly', 'yearly']);
-            $table->timestamp('starts_at')->nullable();
-            $table->timestamp('ends_at')->nullable();
+            $table->dateTime('starts_at')->nullable();
+            $table->dateTime('ends_at')->nullable();
             $table->enum('status', ['active', 'cancelled', 'expired'])->default('active');
             $table->string('payment_provider')->nullable(); // e.g., 'stripe', 'iyzico'
             $table->string('payment_id')->nullable(); // External Reference ID

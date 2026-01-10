@@ -11,7 +11,15 @@
             <div>
                 <h1 class="text-xl font-extrabold text-slate-950 tracking-tight line-clamp-1">{{ $proposal->title }} </h1>
                 <div class="flex flex-wrap items-center gap-3 mt-1">
-                    <p class="text-slate-500 text-sm font-medium whitespace-nowrap">{{ $proposal->proposal_number }} - Teklif Detayı</p>
+                    <p class="text-slate-500 text-sm font-medium whitespace-nowrap flex items-center gap-1">
+                        {{ $proposal->proposal_number }} 
+                        @if($proposal->source === 'mobile')
+                            <i class='bx bx-mobile-alt text-indigo-500 text-lg' title="Mobil Uygulama ile Oluşturuldu"></i>
+                        @else
+                            <i class='bx bx-laptop text-slate-400 text-lg' title="Web Paneli ile Oluşturuldu"></i>
+                        @endif
+                        - Teklif Detayı
+                    </p>
                     <div class="hidden sm:block h-1 w-1 rounded-full bg-slate-300"></div>
                     <p class="text-[10px] text-slate-400 items-center gap-1.5 font-medium hidden sm:flex">
                         <i class='bx bx-pencil text-[11px] text-indigo-400'></i>
@@ -43,7 +51,7 @@
             <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
                 
                 <!-- Quick Actions (Scrollable on mobile) -->
-                <div class="overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 lg:pb-0">
+                <div class="overflow-x-auto lg:overflow-visible -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 lg:pb-0">
                     <div class="flex items-center gap-2 min-w-max">
                         <a href="{{ route('proposals.edit', $proposal) }}" class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all shadow-sm" data-tooltip="Düzenle">
                             <i class='bx bx-edit-alt text-xl'></i>
@@ -51,25 +59,34 @@
 
                         <button type="button" 
                                 @click="openModal('WhatsApp ile Paylaş', '{{ $proposal->customer->mobile_phone }} numaralı telefona WhatsApp üzerinden mesaj gönderilecektir.', 'whatsapp-form', 'WhatsApp\'ı Aç', 'bg-emerald-600')"
-                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all shadow-sm" data-tooltip="WhatsApp ile Gönder">
+                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all shadow-sm" data-tooltip="WhatsApp ile Gönder" title="WhatsApp ile Gönder">
                             <i class='bx bxl-whatsapp text-xl'></i>
                         </button>
 
                         <button type="button" 
                                 @click="openModal('SMS Gönder', '{{ $proposal->customer->mobile_phone }} numaralı telefona teklif özeti SMS olarak gönderilecektir.', 'sms-form', 'SMS Gönder', 'bg-blue-600')"
-                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm" data-tooltip="SMS Gönder">
+                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm" data-tooltip="SMS Gönder" title="SMS Gönder">
                             <i class='bx bx-message-square-dots text-xl'></i>
                         </button>
 
                         <button type="button" 
                                 @click="openModal('E-Posta Gönder', '{{ $proposal->customer->company_email }} adresine teklif PDF dosyası e-posta olarak gönderilecektir.', 'email-form', 'E-Posta Gönder', 'bg-rose-600')"
-                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all shadow-sm" data-tooltip="E-Posta Gönder">
+                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all shadow-sm" data-tooltip="E-Posta Gönder" title="E-Posta Gönder">
                             <i class='bx bx-envelope text-xl'></i>
                         </button>
+                        
+                        @if(auth()->user()->hasPermission('proposals.create'))
+                        <form action="{{ route('proposals.duplicate', $proposal) }}" method="POST" class="contents">
+                            @csrf
+                            <button type="submit" class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 transition-all shadow-sm" data-tooltip="Kopyasını Oluştur" title="Kopyasını Oluştur">
+                                <i class='bx bx-copy text-xl'></i>
+                            </button>
+                        </form>
+                        @endif
 
                         <button type="button" 
                                 @click="openModal('Teklifi Sil', 'Bu teklifi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.', 'delete-form', 'Teklifi Sil', 'bg-red-600')"
-                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all shadow-sm" data-tooltip="Teklifi Sil">
+                                class="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all shadow-sm" data-tooltip="Teklifi Sil" title="Teklifi Sil">
                             <i class='bx bx-trash text-xl'></i>
                         </button>
                     </div>
@@ -82,7 +99,14 @@
                 <div class="flex items-center gap-2 justify-end w-full lg:w-auto">
                     <div class="dropdown relative w-full lg:w-auto" x-data="{ open: false }">
                         <button @click="open = !open" class="h-11 px-6 w-full lg:w-auto rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-bold hover:bg-slate-50 transition-all flex items-center justify-between lg:justify-start gap-2 shadow-sm">
-                            <span>Durum: {{ $proposal->status }}</span>
+                            <span>{{ 
+                                [
+                                    'draft' => 'Taslak',
+                                    'pending' => 'Onay Bekliyor',
+                                    'approved' => 'Onaylandı',
+                                    'rejected' => 'Reddedildi'
+                                ][$proposal->status] ?? $proposal->status 
+                            }}</span>
                             <i class='bx bx-chevron-down'></i>
                         </button>
                         <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-full lg:w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50" x-cloak x-transition>
@@ -97,6 +121,19 @@
                             </form>
                         </div>
                     </div>
+                    
+                    @if($proposal->public_token)
+                        <a href="{{ route('proposals.public.show', $proposal->public_token) }}" target="_blank" class="h-11 px-6 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center gap-2 whitespace-nowrap">
+                            <i class='bx bx-globe'></i> Online Teklif Açık
+                        </a>
+                    @else
+                        <form action="{{ route('proposals.toggle-public', $proposal) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="h-11 px-6 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-bold hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2 whitespace-nowrap">
+                                <i class='bx bx-globe'></i> Online'a Aç
+                            </button>
+                        </form>
+                    @endif
                     
                     <a href="{{ route('proposals.print', $proposal) }}" target="_blank" class="h-11 px-6 rounded-xl bg-slate-950 text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center gap-2 whitespace-nowrap">
                         <i class='bx bx-printer'></i> Yazdır
@@ -155,7 +192,14 @@
                 <div class="flex justify-between items-start mb-12">
                     <div>
                         <h2 class="text-3xl font-black text-slate-950 mb-2">TEKLİF</h2>
-                        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">{{ $proposal->proposal_number }}</p>
+                        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs flex items-center gap-1">
+                            {{ $proposal->proposal_number }}
+                            @if($proposal->source === 'mobile')
+                                <i class='bx bx-mobile-alt text-indigo-500 text-sm' title="Mobil Uygulama ile Oluşturuldu"></i>
+                            @else
+                                <i class='bx bx-laptop text-slate-300 text-sm' title="Web Paneli ile Oluşturuldu"></i>
+                            @endif
+                        </p>
                     </div>
                     <div class="text-right">
                         @php
@@ -167,7 +211,7 @@
                         @endphp
 
                         @if($logoPath)
-                            <img src="{{ asset('storage/'.$logoPath) }}" class="h-16 w-auto ml-auto object-contain" alt="Logo">
+                            <img src="{{ asset('uploads/'.$logoPath) }}" class="h-12 w-auto ml-auto object-contain" alt="Logo">
                         @else
                             <div class="w-16 h-16 bg-slate-950 rounded-2xl flex items-center justify-center ml-auto shadow-xl shadow-slate-200">
                                 <i class='bx bxs-bolt text-white text-3xl'></i>
@@ -315,12 +359,12 @@
                     @forelse($proposal->internalNotes as $note)
                     <div class="flex gap-4 group">
                         <div class="flex-shrink-0">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($note->user->name ?? ($note->user_id == auth()->id() ? auth()->user()->name : 'User')) }}&background=f8fafc&color=0f172a" class="w-10 h-10 rounded-xl" alt="">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($note->user->name ?? ($note->user_id ? 'User' : 'Müşteri')) }}&background={{ $note->user_id ? 'f8fafc' : 'ecfdf5' }}&color={{ $note->user_id ? '0f172a' : '059669' }}" class="w-10 h-10 rounded-xl" alt="">
                         </div>
                         <div class="flex-1 bg-slate-50/50 p-4 rounded-2xl rounded-tl-none border border-slate-100/50 group-hover:bg-white group-hover:border-indigo-100 transition-all">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs font-black text-slate-900 uppercase tracking-tight">
-                                    {{ $note->user->name ?? ($note->user_id == auth()->id() ? auth()->user()->name : 'Bilinmiyor') }}
+                                    {{ $note->user->name ?? ($note->user_id ? 'Bilinmiyor' : 'Müşteri (Online)') }}
                                 </span>
                                 <span class="text-[10px] font-bold text-slate-400">{{ $note->created_at->diffForHumans() }}</span>
                             </div>
@@ -372,6 +416,86 @@
                 </div>
             </div>
             
+            <!-- Online Teklif Kartı (Yenilenmiş Tasarım) -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Online Teklif</h3>
+                        <p class="text-xs text-slate-400 font-medium mt-1">Müşteri erişimi ve paylaşım ayarları</p>
+                    </div>
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                        <i class='bx bx-globe text-xl'></i>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <form action="{{ route('proposals.toggle-public', $proposal) }}" method="POST" class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        @csrf
+                        <div>
+                            <span class="block text-xs font-bold text-slate-900 uppercase tracking-tight">Erişim Durumu</span>
+                            <span class="text-[10px] font-bold {{ $proposal->public_token ? 'text-emerald-500' : 'text-slate-400' }}">
+                                {{ $proposal->public_token ? 'Erişime Açık (Aktif)' : 'Erişime Kapalı' }}
+                            </span>
+                        </div>
+                        
+                        <button type="submit" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $proposal->public_token ? 'bg-emerald-500' : 'bg-slate-200' }}" role="switch" aria-checked="{{ $proposal->public_token ? 'true' : 'false' }}">
+                            <span aria-hidden="true" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $proposal->public_token ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                        </button>
+                    </form>
+
+                    @if($proposal->public_token)
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Paylaşım Linki</label>
+                            
+                            @php
+                                $viewCount = $proposal->activities->where('activity_type', 'viewed')->whereNull('user_id')->count();
+                            @endphp
+
+                            @if($viewCount > 0)
+                            <div class="flex items-center gap-1.5 px-2 py-1 bg-amber-50 rounded-lg border border-amber-100 animate-in fade-in">
+                                <span class="relative flex h-2 w-2">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                </span>
+                                <span class="text-[10px] font-bold text-amber-600 uppercase tracking-tight">Müşteri Görüntüledi ({{ $viewCount }})</span>
+                            </div>
+                            @endif
+                        </div>
+                        <div x-data="{ copied: false }" class="relative">
+                            <div class="flex items-center gap-2 bg-white rounded-xl p-1 border border-slate-200 shadow-sm focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                                <i class='bx bx-link text-slate-400 ml-3'></i>
+                                <input type="text" readonly value="{{ route('proposals.public.show', $proposal->public_token) }}" class="bg-transparent border-none text-xs text-slate-600 w-full focus:ring-0 px-2 truncate font-mono h-10 select-all" id="public-link-{{ $proposal->id }}">
+                                <button @click="
+                                            const input = document.getElementById('public-link-{{ $proposal->id }}');
+                                            input.select();
+                                            input.setSelectionRange(0, 99999); /* For mobile devices */
+                                            try {
+                                                navigator.clipboard.writeText(input.value).then(() => {
+                                                    copied = true;
+                                                    setTimeout(() => copied = false, 2000);
+                                                });
+                                            } catch (err) {
+                                                document.execCommand('copy');
+                                                copied = true;
+                                                setTimeout(() => copied = false, 2000);
+                                            }
+                                        " 
+                                        class="h-9 px-4 flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold text-xs transition-all active:scale-95 whitespace-nowrap">
+                                    <span x-show="!copied">Kopyala</span>
+                                    <span x-show="copied" x-cloak class="flex items-center gap-1"><i class='bx bx-check'></i> Kopyalandı</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-center">
+                        <p class="text-xs text-slate-400">Teklifi müşterinizle paylaşmak için erişime açın.</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Teklif Geçmişi</h3>
                 
@@ -414,3 +538,55 @@
     </div>
 </div>
 @endsection
+
+<style>
+    [data-tooltip] {
+        position: relative;
+    }
+    [data-tooltip]:before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 6px 10px;
+        background-color: #1e293b;
+        color: white;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 8px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        margin-bottom: 8px;
+        z-index: 50;
+        pointer-events: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    [data-tooltip]:after {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: #1e293b transparent transparent transparent;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        margin-bottom: -2px;
+        z-index: 50;
+        pointer-events: none;
+    }
+    [data-tooltip]:hover:before,
+    [data-tooltip]:hover:after {
+        opacity: 1;
+        visibility: visible;
+        margin-bottom: 6px;
+    }
+    [data-tooltip]:hover:after {
+        margin-bottom: -4px;
+    }
+</style>

@@ -19,7 +19,7 @@
             }
         </style>
     </head>
-    <body class="min-h-screen flex flex-col bg-[#fafafa]">
+    <body class="min-h-screen flex flex-col bg-[#fafafa]" x-data="{ modal: null }">
 
         
         <div class="flex-1 flex flex-col items-center justify-center px-6 py-12">
@@ -89,11 +89,32 @@
                             </div>
                         </div>
 
+                        <div class="space-y-3 mt-4">
+                            <div class="flex items-start gap-3">
+                                <input type="checkbox" id="marketing_consent" name="marketing_consent" value="1" {{ old('marketing_consent') ? 'checked' : '' }} class="mt-1 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors cursor-pointer">
+                                <label for="marketing_consent" class="text-xs text-slate-500 leading-snug cursor-pointer select-none">
+                                    Kampanyalardan ve güncellemelerden haberdar olabilmem için tarafıma <a href="#" @click.prevent="modal = 'marketing'" class="text-indigo-600 font-bold hover:underline decoration-indigo-600/30 underline-offset-2">ticari elektronik ileti</a> gönderilmesini kabul ediyorum.
+                                </label>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <input type="checkbox" id="privacy_consent" name="privacy_consent" value="1" required {{ old('privacy_consent') ? 'checked' : '' }} class="mt-1 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors cursor-pointer">
+                                <label for="privacy_consent" class="text-xs text-slate-500 leading-snug cursor-pointer select-none">
+                                    Kişisel verilerimin işlenmesine yönelik <a href="#" @click.prevent="modal = 'privacy'" class="text-indigo-600 font-bold hover:underline decoration-indigo-600/30 underline-offset-2">aydınlatma ve açık rıza metni</a>'ni okudum, onaylıyorum.
+                                </label>
+                            </div>
+                        </div>
+
                         <button type="submit" 
                             class="w-full bg-slate-950 text-white font-bold py-3.5 rounded-xl text-sm hover:bg-slate-800 transition-all duration-200 shadow-lg shadow-slate-900/20 active:scale-[0.98] flex items-center justify-center gap-2 mt-2">
                             <span>{{ __('Hesabımı Oluştur') }}</span>
                             <i class='bx bx-right-arrow-alt text-xl'></i>
                         </button>
+
+                        <div class="text-center px-4">
+                             <p class="text-[11px] text-slate-400 font-medium">
+                                Hesabımı Oluştur'a tıklayarak <a href="#" @click.prevent="modal = 'terms'" class="text-blue-600 font-bold hover:underline decoration-blue-600/30 underline-offset-2">Kullanım Sözleşmesi</a>'ni onaylıyorum.
+                             </p>
+                        </div>
 
                         <div class="relative py-2">
                             <div class="absolute inset-0 flex items-center">
@@ -126,7 +147,7 @@
                 </div>
             </div>
         </div>
-         <div class="w-full py-6 flex flex-col items-center gap-4 z-50 bg-[#fafafa] md:fixed md:bottom-0 md:left-0">
+         <div class="w-full py-6 flex flex-col items-center gap-4 z-50 bg-[#fafafa]">
              <!-- Language Switcher -->
              <div x-data="{ open: false }" class="relative">
                 <button @click="open = !open" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm hover:shadow text-xs font-bold text-slate-600 transition-all">
@@ -156,6 +177,86 @@
 
             <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                 &copy; {{ date('Y') }} Fiyera.co
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div x-show="modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4" style="display: none;">
+            <!-- Backdrop -->
+            <div x-show="modal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="modal = null" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+            
+            <!-- Modal Content -->
+            <div x-show="modal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-95 translate-y-4" class="relative bg-white w-full max-w-2xl max-h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+                
+                <!-- Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="text-lg font-bold text-slate-900" x-text="modal === 'marketing' ? 'Ticari Elektronik İleti İzni' : (modal === 'privacy' ? 'Aydınlatma ve Açık Rıza Metni' : 'Kullanım Sözleşmesi')"></h3>
+                    <button @click="modal = null" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+                        <i class='bx bx-x text-2xl'></i>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6 overflow-y-auto text-sm text-slate-600 leading-relaxed space-y-4">
+                    
+                    <!-- Ticari İleti İçeriği -->
+                    <template x-if="modal === 'marketing'">
+                        <div class="space-y-4">
+                            <p class="font-bold text-slate-900">Ticari Elektronik İleti Onayı</p>
+                            <p>Fiyera.co Inc. olarak, sizlere daha iyi hizmet sunabilmek, yeniliklerden, kampanyalardan ve özel fırsatlardan haberdar olmanızı sağlamak amacıyla ticari elektronik iletiler göndermek istiyoruz.</p>
+                            <p>Bu metni onaylayarak; Fiyera.co Inc. tarafından sağlanan hizmetlere ilişkin olarak, tarafima e-posta, SMS, arama ve benzeri yollarla tanıtım, kampanya, bilgilendirme ve benzeri içerikli ticari elektronik iletilerin gönderilmesine açık rıza gösteriyorum.</p>
+                            <p>İstediğiniz zaman, tarafınıza gönderilen iletilerdeki yönlendirmeleri takip ederek veya bizimle iletişime geçerek bu izni iptal etme hakkına sahipsiniz.</p>
+                        </div>
+                    </template>
+
+                    <!-- Aydınlatma Metni İçeriği -->
+                    <template x-if="modal === 'privacy'">
+                        <div class="space-y-4">
+                            <p class="font-bold text-slate-900">Kişisel Verilerin Korunması ve İşlenmesi Hakkında Aydınlatma Metni</p>
+                            <p>Fiyera.co Inc. ("Şirket") olarak, kişisel verilerinizin güvenliği ve gizliliği konusuna azami hassasiyet göstermekteyiz. 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, kişisel verileriniz aşağıda açıklanan kapsamda işlenebilecektir.</p>
+                            
+                            <h4 class="font-bold text-slate-900">1. Kişisel Verilerin Toplanma Yöntemi ve Hukuki Sebebi</h4>
+                            <p>Kişisel verileriniz, web sitemiz, mobil uygulamalarımız, çağrı merkezimiz ve diğer kanallar aracılığıyla, sözleşmenin kurulması ve ifası, hukuki yükümlülüklerimizin yerine getirilmesi, meşru menfaatlerimiz ve açık rızanız hukuki sebeplerine dayalı olarak toplanmaktadır.</p>
+                            
+                            <h4 class="font-bold text-slate-900">2. Kişisel Verilerin İşlenme Amaçları</h4>
+                            <p>Toplanan kişisel verileriniz; hizmetlerimizin sunulması, kullanıcı deneyiminin iyileştirilmesi, hukuki yükümlülüklerin yerine getirilmesi, güvenliğin sağlanması ve tarafınızla iletişime geçilmesi amaçlarıyla işlenmektedir.</p>
+
+                            <h4 class="font-bold text-slate-900">3. Kişisel Verilerin Aktarılması</h4>
+                            <p>Kişisel verileriniz, yasal düzenlemelerin öngördüğü kapsamda, iş ortaklarımıza, tedarikçilerimize, kanunen yetkili kamu kurum ve kuruluşlarına aktarılabilecektir.</p>
+                            
+                            <p>Bu metni onaylayarak, kişisel verilerinizin yukarıda belirtilen amaçlar doğrultusunda işlenmesini ve aydınlatma metnini okuduğunuzu beyan etmektesiniz.</p>
+                        </div>
+                    </template>
+
+                    <!-- Kullanım Sözleşmesi İçeriği -->
+                    <template x-if="modal === 'terms'">
+                        <div class="space-y-4">
+                            <p class="font-bold text-slate-900">Kullanıcı Hizmet Sözleşmesi</p>
+                            <p>İşbu Kullanıcı Hizmet Sözleşmesi ("Sözleşme"), Fiyera.co Inc. ("Fiyera") ile Fiyera.co platformuna üye olan kullanıcı ("Kullanıcı") arasında, aşağıdaki şartlar dahilinde akdedilmiştir.</p>
+                            
+                            <h4 class="font-bold text-slate-900">1. Sözleşmenin Konusu</h4>
+                            <p>İşbu Sözleşme'nin konusu, Kullanıcı'nın Fiyera.co tarafından sunulan SaaS (Hizmet Olarak Yazılım) hizmetlerinden faydalanmasına ilişkin şartların belirlenmesidir.</p>
+                            
+                            <h4 class="font-bold text-slate-900">2. Kullanım Koşulları</h4>
+                            <p>Kullanıcı, platformu hukuka ve genel ahlaka uygun olarak kullanacağını, üçüncü kişilerin haklarını ihlal etmeyeceğini kabul ve taahhüt eder.</p>
+
+                            <h4 class="font-bold text-slate-900">3. Ücretlendirme ve Ödeme</h4>
+                            <p>Hizmetin kullanımı, seçilen paket ve ödeme planına göre ücretlendirilir. Fiyera, fiyat politikasında değişiklik yapma hakkını saklı tutar.</p>
+
+                            <h4 class="font-bold text-slate-900">4. Gizlilik ve Güvenlik</h4>
+                            <p>Taraflar, işbu sözleşme kapsamında edindikleri gizli bilgileri üçüncü kişilerle paylaşmayacağını taahhüt eder.</p>
+                            
+                            <p>Hesabınızı oluşturarak bu sözleşmenin tüm hükümlerini okuduğunuzu, anladığınızı ve kabul ettiğinizi beyan etmektesiniz.</p>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Footer -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                    <button @click="modal = null" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-sm transition-colors">
+                        Anladım ve Kapat
+                    </button>
+                </div>
             </div>
         </div>
     </body>

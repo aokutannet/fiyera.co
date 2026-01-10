@@ -3,9 +3,20 @@
 @section('content')
 <div class="space-y-8" x-data="{ 
     deleteCustomer: null,
+    selected: [],
+    get allSelected() {
+        return this.selected.length === {{ $customers->count() }} && this.selected.length > 0;
+    },
     confirmDelete(customer) {
         this.deleteCustomer = customer;
         $dispatch('open-modal', 'delete-customer-confirm');
+    },
+    toggleAll() {
+        if (this.allSelected) {
+            this.selected = [];
+        } else {
+            this.selected = {{ $customers->pluck('id') }};
+        }
     }
 }">
     <!-- Header -->
@@ -31,6 +42,45 @@
                 <i class='bx bx-plus text-xl'></i> Yeni Müşteri Ekle
             </a>
             @endif
+        </div>
+    </div>
+
+    <!-- Bulk Actions (Floating) -->
+    <div x-show="selected.length > 0" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-full"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-full"
+         class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-full max-w-2xl px-4"
+         style="display: none;">
+        
+        <div class="bg-indigo-50/90 backdrop-blur-xl border border-indigo-100 rounded-full p-2 shadow-2xl shadow-indigo-900/10 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 pl-4">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-200/50 text-indigo-700 font-black text-sm">
+                    <span x-text="selected.length"></span>
+                </div>
+                <span class="text-sm font-bold text-slate-700">Adet müşteri seçildi</span>
+            </div>
+            
+            <div class="flex items-center gap-2 pr-2">
+                <button @click="selected = []" class="h-10 px-6 rounded-full text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-white/50 transition-all flex items-center justify-center leading-none">
+                    Vazgeç
+                </button>
+                
+                <form action="{{ route('customers.bulk-destroy') }}" method="POST" class="flex items-center m-0" onsubmit="return confirm('Seçili müşterileri silmek istediğinize emin misiniz?');">
+                    @csrf
+                    @method('DELETE')
+                    <template x-for="id in selected" :key="id">
+                        <input type="hidden" name="ids[]" :value="id">
+                    </template>
+                    <button type="submit" class="h-10 px-6 rounded-full bg-rose-600 text-white text-xs font-black hover:bg-rose-700 transition-all shadow-lg shadow-rose-200 hover:shadow-rose-300 transform active:scale-95 flex items-center justify-center gap-2 leading-none">
+                        <i class='bx bx-trash text-base'></i>
+                        <span>SEÇİLENLERİ SİL</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -86,6 +136,12 @@
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">İrtibat</p>
                     <p class="text-xs font-medium text-slate-600">{{ $customer->mobile_phone ?? $customer->landline_phone ?? '-' }}</p>
                 </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Teklifler</p>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700">
+                        {{ $customer->proposals_count }} Adet
+                    </span>
+                </div>
             </div>
 
             <!-- Actions -->
@@ -125,16 +181,23 @@
         <table class="w-full text-left">
             <thead>
                 <tr class="bg-slate-50/50 border-b border-slate-100">
+                    <th class="pl-6 py-4 w-4">
+                        <input type="checkbox" @click="toggleAll()" :checked="allSelected" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-0 w-4 h-4 cursor-pointer">
+                    </th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Firma / İlgili Kişi</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kategori / Tür</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">İrtibat</th>
+                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Teklifler</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Durum</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">İşlemler</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
                 @foreach($customers as $customer)
-                <tr class="hover:bg-slate-50/50 transition-colors {{ $customer->status === 'passive' ? 'opacity-60' : '' }}">
+                <tr class="hover:bg-slate-50/50 transition-colors" :class="{'bg-indigo-50/50 hover:bg-indigo-50/80': selected.includes({{ $customer->id }})}">
+                    <td class="pl-6 py-4">
+                        <input type="checkbox" value="{{ $customer->id }}" x-model="selected" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-0 w-4 h-4 cursor-pointer">
+                    </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
@@ -158,6 +221,11 @@
                     <td class="px-6 py-4">
                         <p class="text-sm font-medium text-slate-600">{{ $customer->mobile_phone ?? $customer->landline_phone ?? '-' }}</p>
                         <p class="text-[10px] text-slate-400 font-medium">{{ $customer->company_email }}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            {{ $customer->proposals_count }} Adet
+                        </span>
                     </td>
                     <td class="px-6 py-4">
                         @if($customer->status === 'active')
@@ -197,7 +265,7 @@
                 @endforeach
                 @if($customers->isEmpty())
                 <tr>
-                    <td colspan="5" class="px-6 py-12 text-center">
+                    <td colspan="7" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center gap-3">
                             <i class='bx bx-buildings text-4xl text-slate-200'></i>
                             <p class="text-slate-400 text-sm font-medium">Henüz müşteri eklenmemiş.</p>

@@ -9,6 +9,8 @@ use App\Models\ProposalNote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
 class ProposalController extends Controller
 {
     public function index(Request $request)
@@ -66,26 +68,33 @@ class ProposalController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:tenant.customers,id',
             'title' => 'required|string|max:255',
-            'proposal_date' => 'required|date',
+            'proposal_date' => 'nullable|date',
             'valid_until' => 'nullable|date|after_or_equal:proposal_date',
             'delivery_date' => 'nullable|date',
             'payment_type' => 'nullable|string',
-            'currency' => 'required|string|max:3',
+            'currency' => 'nullable|string|max:3',
             'description' => 'nullable|string',
             'notes' => 'nullable|string',
-            'status' => 'required|in:draft,pending',
-            'discount_type' => 'required|in:fixed,percentage',
-            'discount_value' => 'required|numeric|min:0',
+            'status' => 'nullable|in:draft,pending',
+            'discount_type' => 'nullable|in:fixed,percentage',
+            'discount_value' => 'nullable|numeric|min:0',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'nullable',
             'items.*.description' => 'required|string',
-            'items.*.quantity' => 'required|numeric|min:0.01',
-            'items.*.unit' => 'required|string',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.tax_rate' => 'required|numeric|min:0',
-            'items.*.discount_type' => 'required|in:fixed,percentage',
-            'items.*.discount_value' => 'required|numeric|min:0',
+            'items.*.quantity' => 'nullable|numeric|min:0.01',
+            'items.*.unit' => 'nullable|string',
+            'items.*.unit_price' => 'nullable|numeric|min:0',
+            'items.*.tax_rate' => 'nullable|numeric|min:0',
+            'items.*.discount_type' => 'nullable|in:fixed,percentage',
+            'items.*.discount_value' => 'nullable|numeric|min:0',
         ]);
+
+        // Set defaults
+        $validated['proposal_date'] = $validated['proposal_date'] ?? now();
+        $validated['currency'] = $validated['currency'] ?? 'TRY';
+        $validated['status'] = $validated['status'] ?? 'draft';
+        $validated['discount_type'] = $validated['discount_type'] ?? 'fixed';
+        $validated['discount_value'] = $validated['discount_value'] ?? 0;
 
         $subtotal = 0;
         $totalTaxAmount = 0;
@@ -95,6 +104,14 @@ class ProposalController extends Controller
         // Prepare items and Handle Stock/Product Creation
         foreach ($request->items as $item) {
             
+            // Item defaults
+            $item['quantity'] = $item['quantity'] ?? 1;
+            $item['unit'] = $item['unit'] ?? 'Adet';
+            $item['unit_price'] = $item['unit_price'] ?? 0;
+            $item['tax_rate'] = $item['tax_rate'] ?? 0;
+            $item['discount_type'] = $item['discount_type'] ?? 'fixed';
+            $item['discount_value'] = $item['discount_value'] ?? 0;
+
             // Auto-create product if not selected
             $productId = $item['product_id'] ?? null;
             
@@ -181,9 +198,9 @@ class ProposalController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'proposal_date' => $validated['proposal_date'],
-            'valid_until' => $validated['valid_until'],
-            'delivery_date' => $validated['delivery_date'],
-            'payment_type' => $validated['payment_type'],
+            'valid_until' => $validated['valid_until'] ?? null,
+            'delivery_date' => $validated['delivery_date'] ?? null,
+            'payment_type' => $validated['payment_type'] ?? null,
             'subtotal' => $subtotal,
             'discount_type' => $validated['discount_type'],
             'discount_value' => $validated['discount_value'],
@@ -192,7 +209,7 @@ class ProposalController extends Controller
             'total_amount' => $totalAmount,
             'currency' => $validated['currency'],
             'status' => $validated['status'],
-            'notes' => $validated['notes'],
+            'notes' => $validated['notes'] ?? null,
         ]);
 
         foreach ($proposalItemsData as $itemData) {
@@ -219,7 +236,7 @@ class ProposalController extends Controller
 
     public function edit(Proposal $proposal)
     {
-        $proposal->load('items');
+        $proposal->load(['items.product']);
         $customers = Customer::where('status', 'active')->get();
         return view('tenant.proposals.edit', compact('proposal', 'customers'));
     }
@@ -433,29 +450,52 @@ class ProposalController extends Controller
 
     public function sendEmail(Proposal $proposal)
     {
-        // Email sending logic would go here
-        
-        ProposalActivity::create([
-            'proposal_id' => $proposal->id,
-            'user_id' => auth()->id(),
-            'activity_type' => 'sent_email',
-            'description' => "Teklif müşteriye E-Posta ile gönderildi ({$proposal->customer->company_email})."
-        ]);
+        try {
+            \Illuminate\Support\Facades\Log::info("Attempting to send proposal email...", [
+                'proposal_id' => $proposal->id,
+                'email' => $proposal->customer->company_email
+            ]);
 
-        return back()->with('success', 'E-Posta gönderildi (Loglandı).');
+            \Illuminate\Support\Facades\Mail::to($proposal->customer->company_email)->send(new \App\Mail\ProposalEmail($proposal));
+            
+            \Illuminate\Support\Facades\Log::info("Email sent successfully via Mail facade.");
+
+            ProposalActivity::create([
+                'proposal_id' => $proposal->id,
+                'user_id' => auth()->id(),
+                'activity_type' => 'sent_email',
+                'description' => "Teklif müşteriye E-Posta ile gönderildi ({$proposal->customer->company_email})."
+            ]);
+
+            return back()->with('success', 'E-Posta başarıyla gönderildi.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Email sending failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error($e->getTraceAsString());
+            return back()->with('error', 'E-Posta gönderilirken bir hata oluştu: ' . $e->getMessage());
+        }
     }
 
     public function sendWhatsapp(Proposal $proposal)
     {
+        // Log Activity
         ProposalActivity::create([
             'proposal_id' => $proposal->id,
             'user_id' => auth()->id(),
             'activity_type' => 'sent_whatsapp',
-            'description' => "Teklif müşteriye WhatsApp üzerinden paylaşıldı."
+            'description' => 'Teklif WhatsApp üzerinden paylaşıldı.'
         ]);
 
         $phone = preg_replace('/[^0-9]/', '', $proposal->customer->mobile_phone);
-        $text = urlencode($proposal->proposal_number . ' nolu teklifiniz ekte yer almaktadır. İyi çalışmalar dileriz.');
+        $message = $proposal->proposal_number . ' nolu teklifiniz ekte yer almaktadır.';
+        
+        if ($proposal->public_token) {
+            $link = route('proposals.public.show', $proposal->public_token);
+            $message .= "\n\nTeklifinizi online görüntülemek ve onaylamak için tıklayın:\n" . $link;
+        }
+
+        $message .= "\n\nİyi çalışmalar dileriz.";
+        
+        $text = urlencode($message);
         
         return redirect("https://wa.me/{$phone}?text={$text}");
     }
@@ -503,6 +543,41 @@ class ProposalController extends Controller
 
         return view('tenant.proposals.print', compact('proposal', 'layout', 'primaryColor', 'secondaryColor'));
     }
+    public function pdf(Proposal $proposal)
+    {
+        $proposal->load(['customer', 'user', 'items']);
+
+        // Fetch new layout settings
+        $settings = \App\Models\Setting::whereIn('key', [
+            'proposal_layout', 
+            'proposal_color_primary', 
+            'proposal_color_secondary'
+        ])->get()->keyBy('key');
+
+        $layout = json_decode($settings['proposal_layout']->value ?? '[]', true);
+        
+        // Fallback layout if empty
+        if (empty($layout)) {
+            $layout = [
+                ['id' => 'header', 'visible' => true],
+                ['id' => 'separator_1', 'visible' => true],
+                ['id' => 'recipient', 'visible' => true],
+                ['id' => 'items', 'visible' => true],
+                ['id' => 'summary', 'visible' => true],
+                ['id' => 'notes', 'visible' => true],
+                ['id' => 'footer', 'visible' => true],
+            ];
+        }
+
+        $primaryColor = $settings['proposal_color_primary']->value ?? '#111827';
+        $secondaryColor = $settings['proposal_color_secondary']->value ?? '#6B7280';
+
+        $pdf = Pdf::loadView('tenant.proposals.print', compact('proposal', 'layout', 'primaryColor', 'secondaryColor') + ['isPdf' => true]);
+
+        
+        return $pdf->download($proposal->proposal_number . '.pdf');
+    }
+
     public function designPreview(Request $request)
     {
         // 1. Create Dummy Data
@@ -583,5 +658,381 @@ class ProposalController extends Controller
         $secondaryColor = $request->input('secondary_color', $settings['proposal_color_secondary']->value ?? '#6B7280');
 
         return view('tenant.proposals.print', compact('proposal', 'layout', 'primaryColor', 'secondaryColor'));
+    }
+    public function bulkActions(Request $request)
+    {
+        // Increase time limit for bulk PDF generation/sending
+        set_time_limit(300);
+
+        // Pre-process ids if sent as JSON string
+        if ($request->filled('ids') && is_string($request->ids)) {
+            $decoded = json_decode($request->ids, true);
+            if (is_array($decoded)) {
+                $request->merge(['ids' => $decoded]);
+            }
+        }
+
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:tenant.proposals,id',
+            'action' => 'required|in:delete,status,email,sms',
+            'status' => 'nullable|required_if:action,status|in:draft,pending,approved,rejected',
+        ]);
+        
+        \Illuminate\Support\Facades\Log::info('Bulk Action Started', $request->all());
+
+        $ids = $request->ids;
+        $action = $request->action;
+        $successCount = 0;
+        $failCount = 0;
+
+        switch ($action) {
+            case 'delete':
+                foreach ($ids as $id) {
+                    $proposal = Proposal::with('items')->find($id);
+                    if ($proposal) {
+                        // Restore stock
+                        foreach ($proposal->items as $item) {
+                            if ($item->product_id) {
+                                $product = \App\Models\Product::find($item->product_id);
+                                if ($product && $product->stock_tracking) {
+                                    $product->increment('stock', $item->quantity);
+                                }
+                            }
+                        }
+                        $proposal->delete();
+                        $successCount++;
+                    }
+                }
+                $message = "{$successCount} adet teklif silindi.";
+                break;
+
+            case 'status':
+                $newStatus = $request->status;
+                foreach ($ids as $id) {
+                    $proposal = Proposal::find($id);
+                    if ($proposal) {
+                        $oldStatus = $proposal->status;
+                        $proposal->update(['status' => $newStatus]);
+                        
+                        ProposalActivity::create([
+                           'proposal_id' => $proposal->id,
+                           'user_id' => auth()->id(),
+                           'activity_type' => 'status_changed',
+                           'description' => "Teklif durumu toplu işlem ile güncellendi.",
+                           'old_value' => $oldStatus,
+                           'new_value' => $newStatus
+                        ]);
+                        $successCount++;
+                    }
+                }
+                $message = "{$successCount} adet teklifin durumu güncellendi.";
+                break;
+
+            case 'email':
+                foreach ($ids as $id) {
+                    // Eager load everything needed for the Email/PDF
+                    $proposal = Proposal::with(['customer', 'items', 'user.tenant'])->find($id);
+                    
+                    if ($proposal && $proposal->customer && $proposal->customer->company_email) {
+                         try {
+                            \Illuminate\Support\Facades\Mail::to($proposal->customer->company_email)
+                                ->send(new \App\Mail\ProposalEmail($proposal));
+                            
+                            ProposalActivity::create([
+                                'proposal_id' => $proposal->id,
+                                'user_id' => auth()->id(),
+                                'activity_type' => 'sent_email',
+                                'description' => "Teklif müşteriye toplu işlem ile tekrar gönderildi."
+                            ]);
+                            $successCount++;
+                        } catch (\Exception $e) {
+                            \Illuminate\Support\Facades\Log::error("Bulk email failed for Proposal {$id}: " . $e->getMessage());
+                            $failCount++;
+                        }
+                    } else {
+                        $failCount++; // Missing customer or email
+                    }
+                }
+                
+                $message = "{$successCount} adet teklif başarıyla gönderildi.";
+                if ($failCount > 0) {
+                    $message .= " ({$failCount} adet gönderim başarısız oldu veya e-posta adresi eksik)";
+                }
+                break;
+
+            case 'sms':
+                 foreach ($ids as $id) {
+                    $proposal = Proposal::with('customer')->find($id);
+                    if ($proposal && $proposal->customer && $proposal->customer->mobile_phone) {
+                         ProposalActivity::create([
+                            'proposal_id' => $proposal->id,
+                            'user_id' => auth()->id(),
+                            'activity_type' => 'sent_sms',
+                            'description' => "Teklif müşteriye toplu işlem ile SMS olarak gönderildi."
+                        ]);
+                        $successCount++;
+                    } else {
+                        $failCount++;
+                    }
+                }
+                $message = "{$successCount} adet SMS gönderildi.";
+                if ($failCount > 0) {
+                    $message .= " ({$failCount} adet gönderim başarısız)";
+                }
+                break;
+        }
+
+        if ($failCount > 0 && $successCount == 0) {
+            return redirect()->route('proposals.index')->with('error', $message);
+        }
+
+        return redirect()->route('proposals.index')->with('success', $message);
+    }
+    public function duplicate(Proposal $proposal)
+    {
+        // 1. Check Limits (Optional but good practice)
+        $tenant = \App\Models\Tenant::find(auth()->user()->tenant_id);
+        $plan = $tenant->plan;
+        $limit = $plan->limits['proposal_monthly'] ?? 0;
+        
+        if ($limit != -1) {
+             if (Proposal::count() >= $limit) {
+                return back()->with('error', 'Paketinizin teklif oluşturma limiti doldu. Lütfen paketinizi yükseltin.');
+             }
+        }
+
+        // 2. Replicate Proposal
+        $newProposal = $proposal->replicate();
+        $newProposal->proposal_number = 'TEK-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+        $newProposal->title = $proposal->title . ' - Kopyası';
+        $newProposal->status = 'draft';
+        $newProposal->proposal_date = now();
+        $newProposal->valid_until = now()->addDays(7); // Default valid days or keep original spread? User said "Complete Copy". I'll reset dates to current context.
+        $newProposal->created_at = now();
+        $newProposal->updated_at = now();
+        $newProposal->push(); // Saves the model and internal key
+
+        // 3. Replicate Items
+        foreach ($proposal->items as $item) {
+            $newItem = $item->replicate();
+            $newItem->proposal_id = $newProposal->id;
+            $newItem->created_at = now();
+            $newItem->updated_at = now();
+            $newItem->save();
+
+            // Handle Stock (Deduct again since it's a new proposal created, similar to store logic)
+            // Note: Store logic deducts on creation regardless of status.
+            if ($newItem->product_id) {
+                $product = \App\Models\Product::withTrashed()->find($newItem->product_id);
+                if ($product && $product->stock_tracking) {
+                    $product->decrement('stock', $newItem->quantity);
+                }
+            }
+        }
+
+        // 4. Log Activity
+        ProposalActivity::create([
+            'proposal_id' => $newProposal->id,
+            'user_id' => auth()->id(),
+            'activity_type' => 'created',
+            'description' => "Teklif, {$proposal->proposal_number} numaralı tekliften kopyalanarak oluşturuldu.",
+            'new_value' => 'draft'
+        ]);
+
+        return redirect()->route('proposals.edit', $newProposal)->with('success', 'Teklif başarıyla kopyalandı.');
+    }
+
+    public function togglePublic(Proposal $proposal)
+    {
+        $oldState = (bool) $proposal->public_token;
+
+        if ($proposal->public_token) {
+            $proposal->update(['public_token' => null]);
+            $message = 'Teklif online erişime kapatıldı.';
+        } else {
+            $tenantId = auth()->user()->tenant_id;
+            $proposal->public_token = base64_encode($tenantId . '|' . \Illuminate\Support\Str::random(32));
+            $proposal->save();
+            $message = 'Teklif online erişime açıldı.';
+        }
+
+        // Log Activity
+        ProposalActivity::create([
+            'proposal_id' => $proposal->id,
+            'user_id' => auth()->id(),
+            'activity_type' => 'system',
+            'description' => $message
+        ]);
+
+        return back()->with('success', $message);
+    }
+
+    public function publicShow($token)
+    {
+        $proposal = $this->resolveProposalFromToken($token);
+
+        if (!$proposal) {
+            return view('public.proposal.expired');
+        }
+
+        // Automatic Expiration Check
+        if ($proposal->valid_until && $proposal->valid_until->endOfDay()->isPast()) {
+            return view('public.proposal.expired');
+        }
+        
+        $proposal->load(['items', 'customer', 'user', 'activities']);
+        
+        $settings = \App\Models\Setting::whereIn('key', [
+            'proposal_layout', 
+            'proposal_color_primary', 
+            'proposal_color_secondary',
+            'proposal_logo', 
+            'company_logo_png', 
+            'company_logo_jpg'
+        ])->get()->keyBy('key');
+
+        $layout = json_decode($settings['proposal_layout']->value ?? '[]', true);
+        if (empty($layout)) {
+            $layout = [
+                ['id' => 'header', 'visible' => true],
+                ['id' => 'separator_1', 'visible' => true],
+                ['id' => 'recipient', 'visible' => true],
+                ['id' => 'items', 'visible' => true],
+                ['id' => 'summary', 'visible' => true],
+                ['id' => 'notes', 'visible' => true],
+                ['id' => 'footer', 'visible' => true],
+            ];
+        }
+        $primaryColor = $settings['proposal_color_primary']->value ?? '#111827';
+        $secondaryColor = $settings['proposal_color_secondary']->value ?? '#6B7280';
+        
+        return view('public.proposal.show', compact('proposal', 'layout', 'primaryColor', 'secondaryColor', 'settings'));
+    }
+
+    public function publicAction(Request $request, $token)
+    {
+        $proposal = $this->resolveProposalFromToken($token);
+
+        if (!$proposal) {
+            return view('public.proposal.expired');
+        }
+
+        // Automatic Expiration Check
+        if ($proposal->valid_until && $proposal->valid_until->endOfDay()->isPast()) {
+            return view('public.proposal.expired');
+        }
+        
+        $request->validate([
+            'action' => 'required|in:approve,reject',
+            'note' => 'nullable|string'
+        ]);
+
+        if ($request->action === 'approve') {
+            $proposal->update(['status' => 'approved']);
+            $desc = "Teklif, online bağlantı üzerinden MÜŞTERİ tarafından ONAYLANDI.";
+            $mailSubject = "Teklifiniz Onaylandı! - " . $proposal->proposal_number;
+        } else {
+            $proposal->update(['status' => 'rejected']);
+            $desc = "Teklif, online bağlantı üzerinden MÜŞTERİ tarafından REDDEDİLDİ.";
+             $mailSubject = "Teklif Ret Bildirimi - " . $proposal->proposal_number;
+        }
+
+        if ($request->note) {
+            $desc .= " (Not: {$request->note})";
+             $proposal->internalNotes()->create([
+                'user_id' => null, 
+                'note' => "Müşteri Notu: " . $request->note,
+            ]);
+        }
+        
+        // Log Activity
+        ProposalActivity::create([
+            'proposal_id' => $proposal->id,
+            'user_id' => $proposal->user_id, // Attributing to the owner or null? Keeping owner as 'actor' might be confusing, but system is actor.
+            // Better: user_id null for system/customer actions
+            'user_id' => null, 
+            'activity_type' => 'status_changed',
+            'description' => $desc,
+            'new_value' => $proposal->status
+        ]);
+        
+        // Send Notification Email to Proposal Owner
+        if ($proposal->user && $proposal->user->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($proposal->user->email)->send(new \App\Mail\ProposalStatusNotification($proposal, $request->action, $request->note));
+            } catch (\Exception $e) {
+                // Log but don't stop flow
+                \Illuminate\Support\Facades\Log::error("Failed to send proposal status notification: " . $e->getMessage());
+            }
+        }
+
+        return back()->with('success', 'İşleminiz başarıyla kaydedildi. Teşekkür ederiz.');
+    }
+
+    public function publicPrint($token)
+    {
+        $proposal = $this->resolveProposalFromToken($token);
+        if (!$proposal) abort(404);
+        
+        // Log activity if not logged
+        $sessionKey = 'viewed_proposal_print_' . $proposal->id;
+        if (!session()->has($sessionKey)) {
+             ProposalActivity::create([
+                'proposal_id' => $proposal->id,
+                'user_id' => null,
+                'activity_type' => 'viewed',
+                'description' => 'Müşteri teklifi yazdırma ekranını açtı.',
+                'ip_address' => request()->ip(),
+            ]);
+            session()->put($sessionKey, true);
+        }
+
+        return $this->print($proposal);
+    }
+
+    public function publicPdf($token)
+    {
+        $proposal = $this->resolveProposalFromToken($token);
+        if (!$proposal) abort(404);
+
+        // Log activity if not logged
+        $sessionKey = 'viewed_proposal_pdf_' . $proposal->id;
+        if (!session()->has($sessionKey)) {
+             ProposalActivity::create([
+                'proposal_id' => $proposal->id,
+                'user_id' => null,
+                'activity_type' => 'viewed',
+                'description' => 'Müşteri teklif PDF dosyasını indirdi.',
+                'ip_address' => request()->ip(),
+            ]);
+            session()->put($sessionKey, true);
+        }
+
+        return $this->pdf($proposal);
+    }
+
+    private function resolveProposalFromToken($token)
+    {
+        try {
+            $decoded = base64_decode($token);
+            $parts = explode('|', $decoded);
+            if (count($parts) != 2) return null;
+            $tenantId = $parts[0];
+            
+            $dbName = "tenant_{$tenantId}_teklif";
+            // Check if DB exists to prevent connection errors? 
+            // Laravel config set might throw if DB doesn't exist? No, only on connection.
+            // We'll trust the try-catch for connection issues.
+            
+            config(['database.connections.tenant.database' => $dbName]);
+            \Illuminate\Support\Facades\DB::purge('tenant');
+            \Illuminate\Support\Facades\DB::reconnect('tenant');
+            
+            return Proposal::where('public_token', $token)->first();
+            
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

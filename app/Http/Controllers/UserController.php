@@ -19,7 +19,7 @@ class UserController extends Controller
         $currentCount = User::where('tenant_id', $tenant->id)->count();
         $limitReached = ($limit != -1 && $currentCount >= $limit);
 
-        $users = User::where('tenant_id', $tenant->id)->latest()->get();
+        $users = User::where('tenant_id', $tenant->id)->withCount('proposals')->latest()->get();
         $availablePermissions = User::getAvailablePermissions();
         return view('tenant.users.index', compact('users', 'availablePermissions', 'limitReached', 'plan'));
     }

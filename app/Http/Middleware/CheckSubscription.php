@@ -48,7 +48,7 @@ class CheckSubscription
             // Assuming route names follow standard resource conventions (create, edit)
             $routeName = $request->route()->getName();
             if ($routeName && (str_contains($routeName, '.create') || str_contains($routeName, '.edit'))) {
-                 return redirect()->route('subscription.index')->with('error', 'Deneme süreniz doldu. Yeni kayıt oluşturmak veya düzenlemek için paketinizi yükseltin.');
+                 return redirect()->route('subscription.index')->with('error', 'Deneme süreniz doldu. Yeni kayıt oluşturmak veya düzenlemek için .');
             }
             
             // Allow viewing (Index, Show) - Read Only

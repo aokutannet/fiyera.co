@@ -14,11 +14,7 @@
         billing: 'monthly',
         period() { return this.billing === 'yearly' ? '/yıl' : '/ay'; }
      }">
-    
     @if(isset($selectedPlan) && $selectedPlan)
-        <!-- ============================================== -->
-        <!-- CHECKOUT STATE (For Upgrade Flow) -->
-        <!-- ============================================== -->
         <div class="max-w-7xl mx-auto">
             <!-- Back Link -->
             <a href="{{ route('subscription.upgrade') }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold text-sm mb-6 transition-colors group">
@@ -285,7 +281,7 @@
         <!-- ============================================== -->
         
         @if(request()->routeIs('subscription.upgrade') || request()->routeIs('subscription.plans'))
-            <div class="max-w-[1400px] mx-auto mb-8">
+            <div class="max-w-[1400px] mx-auto mb-8 text-center">
                  <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold text-sm transition-colors group">
                     <i class='bx bx-arrow-back text-lg group-hover:-translate-x-1 transition-transform'></i>
                     <span>{{ __('Panele Dön') }}</span>
@@ -406,7 +402,7 @@
                             </div>
                             
                             <!-- Bonus Text -->
-                            <p class="text-indigo-600 text-xs font-bold mt-2" x-show="billing === 'yearly'">
+                            <p class="text-indigo-600 text-xs font-bold mt-2" x-show="billing === 'yearly' && {{ floatval($plan->price_yearly) }} > 0">
                                 {{ __('+3 ay ücretsiz') }}
                             </p>
                         </div>
@@ -447,21 +443,32 @@
                                 </a>
                              @endif
                         @else
+                            {{-- Logic for New Users / Trial Users --}}
+                            @php
+                                $isOnTrial = isset($tenant) && $tenant->onTrial();
+                                $currentPlanId = isset($tenant) ? $tenant->subscription_plan_id : null;
+                                $price = (request('billing', $billing ?? 'monthly') === 'monthly' ? $plan->price_monthly : $plan->price_yearly);
+                                $isFree = $price == 0;
+                            @endphp
+
                             <form action="{{ route('onboarding.subscribe') }}" method="POST" class="mb-3">
                                 @csrf
                                 <input type="hidden" name="plan" value="{{ $plan->slug }}">
                                 <input type="hidden" name="billing_cycle" :value="billing">
                                 
+                                {{-- Main Action Button --}}
                                 <button type="submit" class="w-full py-3.5 rounded-lg font-bold text-sm transition-all duration-200 transform hover:scale-[1.02]
                                     {{ $plan->is_popular 
                                         ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200' 
-                                        : 'bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-50' 
+                                        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200' 
                                     }}">
-                                    {{ __('14 Gün Ücretsiz Dene') }}
+                                    <span x-text="(billing === 'monthly' ? {{ $plan->price_monthly }} : {{ $plan->price_yearly }}) == 0 ? '{{ __('Ücretsiz Hemen Başla') }}' : ({{ $isOnTrial ? 'true' : 'false' }} ? '{{ __('Pakete Geçiş Yap') }}' : '{{ __('14 Gün Ücretsiz Dene') }}')"></span>
                                 </button>
                             </form>
 
+                            {{-- Buy Now Link (Only for Paid Plans & If on Trial or basic view) --}}
                             <a :href="'?plan={{ $plan->id }}&billing=' + billing" 
+                               x-show="(billing === 'monthly' ? {{ $plan->price_monthly }} : {{ $plan->price_yearly }}) > 0"
                                class="w-full py-2 rounded-lg font-bold text-xs text-center block transition-all hover:bg-slate-100 text-slate-400 hover:text-slate-600 mb-8">
                                 {{ __('veya Hemen Satın Al') }}
                             </a>
@@ -478,7 +485,24 @@
                                         {{ $limits['user_count'] == -1 ? __('Sınırsız') : $limits['user_count'] }} {{ __('Kullanıcı') }}
                                     </li>
                                 @endif
-                                <!-- Add other limits if critical -->
+                                @if(isset($limits['proposal_monthly']))
+                                    <li class="flex items-center gap-2 font-bold">
+                                        <i class='bx bx-file text-slate-400'></i>
+                                        {{ $limits['proposal_monthly'] == -1 ? __('Sınırsız') : $limits['proposal_monthly'] }} {{ __('Teklif') }}
+                                    </li>
+                                @endif
+                                @if(isset($limits['customer_count']))
+                                    <li class="flex items-center gap-2 font-bold">
+                                        <i class='bx bx-group text-slate-400'></i>
+                                        {{ $limits['customer_count'] == -1 ? __('Sınırsız') : $limits['customer_count'] }} {{ __('Müşteri') }}
+                                    </li>
+                                @endif
+                                @if(isset($limits['product_count']))
+                                    <li class="flex items-center gap-2 font-bold">
+                                        <i class='bx bx-package text-slate-400'></i>
+                                        {{ $limits['product_count'] == -1 ? __('Sınırsız') : $limits['product_count'] }} {{ __('Ürün') }}
+                                    </li>
+                                @endif
                             </ul>
 
                             <div class="h-px bg-slate-100 mb-6"></div>
@@ -524,6 +548,9 @@
         <div class="mt-20 text-center">
             <p class="text-slate-400 text-xs">
                 {{ __('30-gün para iade garantisi • 7/24 Destek • Güvenli Ödeme') }}
+            </p>
+            <p class="text-slate-400 text-xs pt-6">
+                powered by fiyera.co
             </p>
         </div>
     @endif

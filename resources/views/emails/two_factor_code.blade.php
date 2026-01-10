@@ -29,7 +29,11 @@
             
             <h1 class="h1">Doğrulama Kodunuz</h1>
             
-            <p class="p">Hesabınıza güvenli bir şekilde giriş yapmak için aşağıdaki kodu kullanın. Bu kod 10 dakika süreyle geçerlidir.</p>
+            @if(isset($isMobile) && $isMobile)
+                <p class="p"><strong>Mobil uygulamasından</strong> hesabınıza güvenli bir şekilde giriş yapmak için aşağıdaki kodu kullanın. Bu kod 10 dakika süreyle geçerlidir.</p>
+            @else
+                <p class="p">Hesabınıza güvenli bir şekilde giriş yapmak için aşağıdaki kodu kullanın. Bu kod 10 dakika süreyle geçerlidir.</p>
+            @endif
             
             <div class="code-box">
                 <div class="code">{{ $code }}</div>
