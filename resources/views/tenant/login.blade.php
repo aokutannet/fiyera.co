@@ -18,6 +18,7 @@
                 letter-spacing: -0.01em; 
             }
         </style>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
     <body class="min-h-screen flex flex-col bg-[#fafafa]">
 
@@ -66,6 +67,8 @@
                             <input type="checkbox" id="remember" name="remember" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                             <label for="remember" class="text-sm font-medium text-slate-600">{{ __('Beni Hatırla') }}</label>
                         </div>
+
+                        <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
 
                         <button type="submit" 
                             class="w-full bg-slate-950 text-white font-bold py-3.5 rounded-xl text-sm hover:bg-slate-800 transition-all duration-200 shadow-lg shadow-slate-900/20 active:scale-[0.98] flex items-center justify-center gap-2">
