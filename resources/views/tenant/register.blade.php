@@ -104,8 +104,6 @@
                             </div>
                         </div>
 
-                        </div>
-
                         <button type="submit" 
                             class="w-full bg-slate-950 text-white font-bold py-3.5 rounded-xl text-sm hover:bg-slate-800 transition-all duration-200 shadow-lg shadow-slate-900/20 active:scale-[0.98] flex items-center justify-center gap-2 mt-2">
                             <span>{{ __('Hesabımı Oluştur') }}</span>
